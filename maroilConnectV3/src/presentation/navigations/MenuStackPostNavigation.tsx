@@ -3,6 +3,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {PublicarScreen} from '../screens/PublicarScreen';
 import {ChatScreen} from '../screens/ChatScreen';
+import {PerfilUsuarioScreen} from '../screens/PerfilUsuarioScreen';
 
 export type RootStackParams2 = {
   ChatScreens: undefined;
@@ -11,12 +12,7 @@ export type RootStackParams2 = {
   CreateChatScreen: undefined;
   PersonaScreens: {id: number; nombre: string};
   PublicarScreen: {postId: string};
-  pantallas: {
-    routes: {
-      name: string;
-      state: {routes: {name: string; params: {postId: string}}[]}[];
-    }[];
-  };
+  PerfilUsuarioScreen: {usertId: string};
   pantallas: {
     routes: {
       name: string;
@@ -34,8 +30,18 @@ export const MenuStackPostNavigation = () => {
         // options={{cardStyleInterpolator: fadeAnimation}}
         name="PublicarScreen"
         component={PublicarScreen}
+        options={{
+          headerShown: false,
+          title: 'Crear Publicacion',
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
+        // options={{cardStyleInterpolator: fadeAnimation}}
+        name="PerfilUsuarioScreen"
+        component={PerfilUsuarioScreen}
+      /> */}
+      {/* <Stack.Screen
         name="ChatScreen"
         component={ChatScreen}
         options={{
@@ -55,7 +61,7 @@ export const MenuStackPostNavigation = () => {
           //   };
           // },
         }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

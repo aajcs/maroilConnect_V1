@@ -24,6 +24,7 @@ const updateChat = async (chatMenssage: Partial<chatMenssage>) => {
 
 const createChat = async (chatMenssage: Partial<chatMenssage>) => {
   // const {authorChat, mediaChat, ...rest} = chat;
+
   chatMenssageSend = {
     chatIdChatMessage: chatMenssage.chatId,
     messageChatMessage: chatMenssage.message,

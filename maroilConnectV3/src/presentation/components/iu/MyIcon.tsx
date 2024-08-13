@@ -6,9 +6,17 @@ interface Props {
   name: string;
   color?: string;
   white?: boolean;
+  width?: number;
+  height?: number;
 }
 
-export const MyIcon = ({name, color, white = false}: Props) => {
+export const MyIcon = ({
+  name,
+  color,
+  white = false,
+  width = 22,
+  height = 22,
+}: Props) => {
   const theme = useTheme();
 
   if (white) {
@@ -23,7 +31,9 @@ export const MyIcon = ({name, color, white = false}: Props) => {
     color = theme[color] ?? theme['text-basic-color'];
   }
 
-  return <Icon style={styles.icon} fill={color} name={name} />;
+  return (
+    <Icon style={{...styles.icon, width, height}} fill={color} name={name} />
+  );
 };
 
 const styles = StyleSheet.create({

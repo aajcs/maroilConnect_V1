@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "520855097111",
+    "project_id": "soporte-maroil",
+    "storage_bucket": "soporte-maroil.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520855097111:android:ab2fd33036a0a84b16f152",
+        "android_client_info": {
+          "package_name": "com.maroilconnectv3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520855097111-1meat5ql6d8p116iqvmp7b7fv3h4r4bm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnUmJfcj8WN3yNxD48IfQv9AlT3qflnEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520855097111-1meat5ql6d8p116iqvmp7b7fv3h4r4bm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

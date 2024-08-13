@@ -29,6 +29,9 @@ export const ChatsScreen = () => {
   const navigation = useNavigation();
   useEffect(() => {
     navigation.setOptions({
+      headerleft: () => (
+        <BuscarChat data={chatsState || []} setData={setChatBuscar} />
+      ),
       headerRight: () => (
         <Button
           accessoryRight={<MyIcon name="plus-outline" white />}
@@ -68,7 +71,22 @@ export const ChatsScreen = () => {
         <FullScreenLoader />
       ) : (
         <>
-          <BuscarChat data={chatsState || []} setData={setChatBuscar} />
+          <Layout
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Layout style={{flex: 1}}>
+              <BuscarChat data={chatsState || []} setData={setChatBuscar} />
+            </Layout>
+            <Button
+              accessoryRight={<MyIcon name="plus-outline" white />}
+              style={{height: 20, marginRight: 10}}
+              onPress={() => {
+                navigation.navigate('CreateChatScreen');
+              }}></Button>
+          </Layout>
           <ChatList chats={chatBuscar} upTopChat={upTopChat} />
         </>
       )}

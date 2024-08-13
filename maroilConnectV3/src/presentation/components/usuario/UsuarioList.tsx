@@ -22,7 +22,7 @@ export const UsuarioList = ({usuarios}: Props) => {
 
   const onPullToRefresh = async () => {
     setIsRefreshing(true);
-    queryClient.invalidateQueries({queryKey: ['posts', 'infinite']});
+    queryClient.invalidateQueries({queryKey: ['usuarios', 'infinite']});
     setIsRefreshing(false);
   };
 

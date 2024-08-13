@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 import {HomeScreen} from '../screens/HomeScreen';
 
-import {createContext, useContext, useEffect, useRef} from 'react';
+import {createContext, useContext, useEffect, useRef, useState} from 'react';
 
 import {MyIcon} from '../components/iu/MyIcon';
 import {MensajeriaScreen} from '../screens/MensajeriaScreen';
@@ -18,6 +18,8 @@ import {useNavigation} from '@react-navigation/native';
 import {Layout} from '@ui-kitten/components';
 import {NotificacionesScreen} from '../screens/NotificacionesScreen';
 import {TabBarVisibleContext} from '../providers/TabBarVisibleContext';
+import {useAuthStore} from '../store/auth/useAuthStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //
 const Tab = createBottomTabNavigator();
@@ -53,6 +55,18 @@ const CustomTabBar = (props: any) => {
 };
 
 export const MenuAbajoPrincipalNavitation: React.FC = () => {
+  const {user} = useAuthStore();
+  const [totalMessage, setTotalMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getTotalMessage = async () => {
+      const value = await AsyncStorage.getItem('totalMessage');
+
+      setTotalMessage(value || null); // Provide a default value of null if value is null
+    };
+
+    getTotalMessage();
+  }, []);
   const navigation = useNavigation();
   const EventListenerComponent = () => {
     return <Layout />;
@@ -96,13 +110,36 @@ export const MenuAbajoPrincipalNavitation: React.FC = () => {
       <Tab.Screen
         name="HomeScreen"
         component={HomeScreen}
-        options={{title: 'Inicio'}}
+        options={{
+          title: 'Inicio',
+          tabBarLabel: ({focused, color, position}) => (
+            <Text
+              style={{fontSize: focused ? 14 : 12, color}}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              Inicio
+            </Text>
+          ),
+        }}
       />
 
       <Tab.Screen
         name="NotificacionesScreen"
         component={NotificacionesScreen}
-        options={{title: 'Notificaciones'}}
+        options={{
+          title: 'Notificaciones',
+          tabBarLabel: ({focused, color, position}) => (
+            <Text
+              style={{
+                fontSize: focused ? 14 : 12,
+                color,
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              Notificaciones
+            </Text>
+          ),
+        }}
       />
       {/* <Tab.Screen
         name="PublicarScreen"
@@ -127,50 +164,85 @@ export const MenuAbajoPrincipalNavitation: React.FC = () => {
         //   },
         // }}
       /> */}
-      <Tab.Screen
-        name="Publicar"
-        component={EventListenerComponent}
-        listeners={{
-          tabPress: e => {
-            // Prevent default action
-            e.preventDefault();
+      {user?.rolesMaroilConnect.some(role =>
+        ['admin', 'superadmin', 'colaborador'].includes(role),
+      ) && (
+        <Tab.Screen
+          name="Publicar"
+          component={EventListenerComponent}
+          options={{
+            title: 'Publicar',
+            tabBarLabel: ({focused, color, position}) => (
+              <Text
+                style={{fontSize: focused ? 14 : 12, color}}
+                numberOfLines={1}
+                ellipsizeMode="tail">
+                Publicar
+              </Text>
+            ),
+          }}
+          listeners={{
+            tabPress: e => {
+              // Prevent default action
+              e.preventDefault();
 
-            // Do something on tab press
+              // Do something on tab press
 
-            // Navigate to the screen
-            // navigation.navigate('PublicarScreen', {
-            //   postId: 'new',
-            // });
-            navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: 'pantallas',
-                  state: {
-                    routes: [
-                      {
-                        name: 'PublicarScreen',
-                        params: {postId: 'new'},
-                      },
-                    ],
+              // Navigate to the screen
+              // navigation.navigate('PublicarScreen', {
+              //   postId: 'new',
+              // });
+              navigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'pantallas',
+                    state: {
+                      routes: [
+                        {
+                          name: 'PublicarScreen',
+                          params: {postId: 'new'},
+                        },
+                      ],
+                    },
                   },
-                },
-              ],
-            });
-          },
-        }}
-      />
+                ],
+              });
+            },
+          }}
+        />
+      )}
+
       <Tab.Screen
         name="MensajeriaScreen"
         component={MensajeriaScreen}
         options={{
           title: 'Mensajeria',
+          tabBarLabel: ({focused, color, position}) => (
+            <Text
+              style={{fontSize: focused ? 14 : 12, color}}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              Mensajeria
+            </Text>
+          ),
+          tabBarBadge: totalMessage || undefined,
         }}
       />
       <Tab.Screen
         name="ModulosScreen"
         component={ModulosScreen}
-        options={{title: 'Modulos'}}
+        options={{
+          title: 'Modulos',
+          tabBarLabel: ({focused, color, position}) => (
+            <Text
+              style={{fontSize: focused ? 14 : 12, color}}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              Modulos
+            </Text>
+          ),
+        }}
       />
       {/* <Tab.Screen name="Settings" component={SettingsScreen} /> */}
     </Tab.Navigator>

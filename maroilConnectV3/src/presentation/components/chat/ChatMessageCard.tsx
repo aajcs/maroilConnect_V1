@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {DateTime} from 'luxon';
 import {useAuthStore} from '../../store/auth/useAuthStore';
 import {chatMenssage} from '../../../domain/entities/chatMenssage';
+import {Layout, Text} from '@ui-kitten/components';
 
 interface Props {
   chatMenssage: chatMenssage;
@@ -14,14 +15,14 @@ export const ChatMessageCard = ({chatMenssage}: Props) => {
   const createMessage = new Date(chatMenssage.createdAt);
 
   return (
-    <View style={styles.content}>
-      <View style={styles.message}>
+    <Layout style={styles.content}>
+      <Layout style={styles.message}>
         <Text style={styles.text}>{chatMenssage.messageChatMessage}</Text>
         <Text style={styles.date}>
           {DateTime.fromISO(createMessage.toISOString()).toFormat('HH:mm')}
         </Text>
-      </View>
-    </View>
+      </Layout>
+    </Layout>
   );
 };
 
@@ -34,10 +35,11 @@ export const styled = isMe => {
       marginBottom: 10,
     },
     message: {
-      flex: 1,
+      // flex: 1,
       backgroundColor: isMe
-        ? 'rgba(143, 155, 179, 0.54)'
+        ? 'rgba(0, 80, 255, 0.54)'
         : 'rgba(123, 155, 179, 0.24)',
+      width: 'auto',
       maxWidth: '80%',
       borderRadius: 10,
       paddingVertical: 6,

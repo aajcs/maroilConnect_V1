@@ -2,15 +2,28 @@ import {Layout, List} from '@ui-kitten/components';
 import {Post} from '../../../domain/entities/post';
 import {PostCard} from './PostCard';
 import {useContext, useRef, useState} from 'react';
-import {Animated, RefreshControl, ViewToken} from 'react-native';
+import {
+  ActivityIndicator,
+  Animated,
+  RefreshControl,
+  ViewToken,
+} from 'react-native';
 import {useQueryClient} from '@tanstack/react-query';
 import {TabBarVisibleContext} from '../../providers/TabBarVisibleContext';
 
 interface Props {
-  post: Post[];
+  post: (Post | null)[];
+  fetchNextPage: () => void;
+  isFetchingNextPage: boolean;
+  borrador?: boolean;
 }
 
-export const PostList = ({post}: Props) => {
+export const PostList = ({
+  post,
+  fetchNextPage,
+  isFetchingNextPage,
+  borrador,
+}: Props) => {
   const queryClient = useQueryClient();
   const scrollY = useContext(TabBarVisibleContext);
   const previousScrollY = useRef(0);
@@ -30,6 +43,8 @@ export const PostList = ({post}: Props) => {
   const onPullToRefresh = async () => {
     setIsRefreshing(true);
     queryClient.invalidateQueries({queryKey: ['posts', 'infinite']});
+    queryClient.invalidateQueries({queryKey: ['postsBorrador', 'infinite']});
+    queryClient.invalidateQueries({queryKey: ['postsUser', 'infinite']});
     setIsRefreshing(false);
   };
 
@@ -45,30 +60,39 @@ export const PostList = ({post}: Props) => {
       useNativeDriver: false,
     }).start();
   };
-
+  const renderItem = ({item, index}) => (
+    <PostCard
+      post={item}
+      index={`${item.id}-${index}`}
+      viewableItems={viewableItems}
+      borrador={borrador}
+    />
+  );
   return (
     <List
-      onScroll={handleScroll}
+      onScroll={!borrador ? handleScroll : undefined}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       bounces={!isRefreshing}
-      style={{padding: 0}}
+      style={{paddingBottom: 0}}
       data={post}
       keyExtractor={(item, index) => `${item.id}-${index}`}
-      renderItem={({item, index}) => (
-        <PostCard
-          post={item}
-          index={`${item.id}-${index}`}
-          viewableItems={viewableItems}
-        />
+      renderItem={renderItem}
+      ListFooterComponent={() => (
+        <Layout style={{height: 100, backgroundColor: 'trasparente'}} />
       )}
-      ListFooterComponent={() => <Layout style={{height: 100}} />}
+      // ListFooterComponent={
+      //   () => <Layout style={{height: 100}} />
+      //   //   isFetchingNextPage && <ActivityIndicator size="large" color="#0000ff" />
+      // }
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onPullToRefresh} />
       }
+      onEndReached={fetchNextPage}
+      onEndReachedThreshold={0.8}
     />
   );
 };

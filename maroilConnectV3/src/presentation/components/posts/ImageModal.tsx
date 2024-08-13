@@ -1,29 +1,65 @@
-import {Button, Layout} from '@ui-kitten/components';
+import {Button, Layout, useTheme} from '@ui-kitten/components';
 import {Image, Modal, StyleSheet} from 'react-native';
-import Carousel from 'react-native-snap-carousel';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {MyIcon} from '../iu/MyIcon';
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image';
+import {useState} from 'react';
 
 interface Props {
   images: {url: string}[];
   viewportWidth: number;
-
+  activeSlide: number;
   visible: boolean;
   onClose: () => void;
   initialSlideIndex: number;
+  onSlideChange: (index: number) => void;
 }
 
 const ImageModal = ({
+  activeSlide,
   images,
   viewportWidth,
   visible,
   onClose,
   initialSlideIndex,
+  onSlideChange,
 }: Props) => {
+  const theme = useTheme();
+
+  const pagination = () => {
+    return (
+      <Layout
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          zIndex: 10300,
+          // bottom: 100,
+          // left: viewportWidth * 0.25,
+          alignSelf: 'center',
+          backgroundColor: 'transparent',
+        }}>
+        <Pagination
+          dotsLength={images?.length || 0}
+          activeDotIndex={activeSlide}
+          containerStyle={{backgroundColor: 'transparent'}}
+          dotStyle={{
+            width: 5,
+            height: 5,
+            borderRadius: 5,
+            marginHorizontal: 1,
+            backgroundColor: 'white',
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </Layout>
+    );
+  };
   const renderItem = ({item, index}: {item: {url: string}; index: number}) => {
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
     const isImage = /\.(jpg|png|jpeg|gif)/i.test(item.url);
+
     return (
       <Layout
         style={{
@@ -70,7 +106,7 @@ const ImageModal = ({
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: 'rgba(0,0,0,0.9)',
         }}>
         <Button
           size="tiny"
@@ -93,7 +129,9 @@ const ImageModal = ({
           sliderWidth={viewportWidth}
           itemWidth={viewportWidth}
           firstItem={initialSlideIndex}
+          onSnapToItem={onSlideChange}
         />
+        {pagination()}
       </Layout>
     </Modal>
   );

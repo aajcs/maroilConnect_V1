@@ -6,8 +6,10 @@ export let socket: Socket | null = null;
 
 export const initSockets = (): void => {
   Platform.OS === 'ios'
-    ? (socket = io('http://localhost:4000/'))
-    : (socket = io('http://172.41.30.80:4000'));
+    ? (socket = io('https://apimaroil.herokuapp.com'))
+    : (socket = io('https://apimaroil.herokuapp.com'));
+  // ?  (socket = io('http://localhost:4000'))
+  // : (socket = io('http://10.10.10.137:4000'));
 
   console.log('api url', API_URL);
 };

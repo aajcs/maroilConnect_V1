@@ -21,7 +21,9 @@ interface Props {
 
 export const ChatMessageForm = ({chat}: Props) => {
   const {_id: chatId} = chat;
+
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -95,7 +97,6 @@ export const ChatMessageForm = ({chat}: Props) => {
       try {
         setKeyboardHeight(0);
         Keyboard.dismiss();
-        console.log('formik', formValue);
 
         // await chatMessageController.sendText(
         //   accessToken,
@@ -123,7 +124,11 @@ export const ChatMessageForm = ({chat}: Props) => {
           formik.handleSubmit();
         }
       }}>
-      <MyIcon name="paper-plane-outline" {...props} />
+      {isFocused ? (
+        <MyIcon name="paper-plane-outline" color="#002885" {...props} />
+      ) : (
+        <MyIcon name="paper-plane-outline" {...props} />
+      )}
     </TouchableOpacity>
   );
 
@@ -141,6 +146,8 @@ export const ChatMessageForm = ({chat}: Props) => {
           //   onEndEditing={!formik.isSubmitting && formik.handleSubmit}
           accessoryRight={sendIcon}
           onEndEditing={() => !formik.isSubmitting && formik.handleSubmit()}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
         {/* <IconButton
           icon={<Icon as={MaterialCommunityIcons} name="send" />}
@@ -163,7 +170,7 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 30,
     // backgroundColor: '#171717',
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
     // borderTopColor: '#333',
     flexDirection: 'row',
     alignItems: 'center',
@@ -178,6 +185,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     borderRadius: 50,
     // marginLeft: 15,
+    borderColor: '#002885',
   },
   iconSend: {
     position: 'absolute',

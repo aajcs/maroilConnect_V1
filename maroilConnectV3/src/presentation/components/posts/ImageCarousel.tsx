@@ -1,9 +1,12 @@
-import {Layout, useTheme} from '@ui-kitten/components';
-import {Image, StyleSheet} from 'react-native';
+import {Layout, Button} from '@ui-kitten/components';
+import {Image, Platform, StyleSheet} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image';
+import VideoPlayer from 'react-native-media-console';
+import {useRef, useState} from 'react';
+import {MyIcon} from '../iu/MyIcon';
 
 interface Props {
   images: {url: string}[];
@@ -21,6 +24,18 @@ export const ImageCarousel = ({
   onSlideChange,
   isViewable,
 }: Props) => {
+  const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+
+  const handleMute = () => {
+    setMuted(!muted);
+  };
+  const MuteIcon = (props: any) => (
+    <MyIcon
+      {...props}
+      name={muted ? 'volume-off-outline' : 'volume-up-outline'}
+    />
+  );
   const renderItem = ({item, index}: {item: {url: string}; index: number}) => {
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
     const isImage = /\.(jpg|png|jpeg|gif)/i.test(item.url);
@@ -28,14 +43,27 @@ export const ImageCarousel = ({
     return (
       <Layout style={{flex: 1}}>
         {isVideo && (
-          <Video
-            source={{uri: item.url.toString()}}
-            style={styles.mediaImage}
-            resizeMode="cover"
-            controls={true}
-            paused={!isViewable}
-            muted={true}
-          />
+          <>
+            <Video
+              ref={videoRef}
+              source={{uri: item.url.toString()}}
+              style={styles.mediaImage}
+              resizeMode="cover"
+              controls={true}
+              fullscreenAutorotate={true}
+              paused={!isViewable}
+              muted={muted}
+              repeat={true}
+            />
+            {Platform.OS === 'android' && (
+              <Button
+                appearance="ghost"
+                onPress={handleMute}
+                style={styles.muteButton}
+                accessoryLeft={MuteIcon}
+              />
+            )}
+          </>
         )}
         {isImage && (
           <TouchableWithoutFeedback onPress={() => onImagePress(images, index)}>
@@ -72,6 +100,7 @@ export const ImageCarousel = ({
         sliderWidth={viewportWidth - 20}
         itemWidth={viewportWidth - 20}
         onSnapToItem={onSlideChange}
+        vertical={false} // Add this line
       />
     </>
   );
@@ -106,5 +135,10 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: 'red',
+  },
+  muteButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
 });

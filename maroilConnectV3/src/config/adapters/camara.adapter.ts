@@ -17,11 +17,11 @@ export class CameraAdapter {
 
     return [];
   }
-  static async getPicturesFromLibrary(): Promise<string[]> {
+  static async getPicturesFromLibrary(limiteSelect: any): Promise<string[]> {
     const response = await launchImageLibrary({
       mediaType: 'photo',
       quality: 0.7,
-      selectionLimit: 10,
+      selectionLimit: limiteSelect || 10,
     });
     if (response.assets && response.assets.length > 0) {
       return response.assets.map(asset => asset.uri!);
@@ -87,8 +87,8 @@ export class CameraAdapter {
 
               Toast.show({
                 type: 'info',
-                text1: 'Compressing video...',
-                text2: `Progress: ${progress * 100}%`,
+                text1: 'Comprimiendo video...',
+                text2: `Progreso: ${progress * 100}%`,
               });
             },
           );

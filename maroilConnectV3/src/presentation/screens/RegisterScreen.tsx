@@ -1,5 +1,5 @@
 import {Button, Input, Layout, Text} from '@ui-kitten/components';
-import {Alert, ScrollView, useWindowDimensions} from 'react-native';
+import {Alert, Image, ScrollView, useWindowDimensions} from 'react-native';
 import {MyIcon} from '../components/iu/MyIcon';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParams} from '../navigations/MenuPrincipalNavigator';
@@ -10,12 +10,14 @@ import {updateCreateUsersActions} from '../../actions/auth/updateCreateUsersActi
 import * as Yup from 'yup';
 import Toast from 'react-native-toast-message';
 import {useAuthStore} from '../store/auth/useAuthStore';
+import {CategoryPicker} from '../components/iu/CategoryPicker';
+import {useState} from 'react';
 
 interface Props extends StackScreenProps<RootStackParams, 'RegisterScreen'> {}
 export const RegisterScreen = ({navigation}: Props) => {
   const {height} = useWindowDimensions();
   const {login} = useAuthStore();
-
+  const [visible, setVisible] = useState(false);
   const mutation = useMutation({
     mutationFn: async (data: Usuario) => {
       const userCreateData = await updateCreateUsersActions({
@@ -40,9 +42,16 @@ export const RegisterScreen = ({navigation}: Props) => {
       Alert.alert('Error', 'Usuario o contraseña incorrectos');
     },
   });
-
+  const toggleModal = () => {
+    setVisible(!visible);
+  };
   const formik = useFormik({
-    initialValues: {nombre: '', correo: '', password: ''},
+    initialValues: {
+      nombre: '',
+      correo: '',
+      password: '',
+      departamento: '',
+    },
     validationSchema: Yup.object({
       nombre: Yup.string().required('El nombre es requerido'),
       correo: Yup.string()
@@ -50,7 +59,17 @@ export const RegisterScreen = ({navigation}: Props) => {
         .required('El correo es requerido'),
       password: Yup.string()
         .min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .matches(
+          /[A-Z]/,
+          'La contraseña debe contener al menos una letra mayúscula',
+        )
+        .matches(/[0-9]/, 'La contraseña debe contener al menos un número')
+        .matches(
+          /[!@#$%^&*(),.?":{}|<>]/,
+          'La contraseña debe contener al menos un carácter especial',
+        )
         .required('La contraseña es requerida'),
+      departamento: Yup.string().required('La categoría es requerida'),
     }),
 
     onSubmit: values => {
@@ -67,7 +86,13 @@ export const RegisterScreen = ({navigation}: Props) => {
         // alignItems: 'center',
       }}>
       <ScrollView style={{marginHorizontal: 40}}>
-        <Layout style={{paddingTop: height * 0.3}}>
+        <Layout style={{paddingTop: height * 0.1}}>
+          <Layout style={{alignItems: 'center', paddingBottom: 50}}>
+            <Image
+              source={require('../../assets/logoConnect.svg')}
+              style={{width: 100, height: 100}}
+            />
+          </Layout>
           <Text category="h1">Crear cuenta</Text>
           <Text category="p2">Por favor, crea una cuenta para continuar</Text>
         </Layout>
@@ -105,6 +130,17 @@ export const RegisterScreen = ({navigation}: Props) => {
           />
           {formik.errors.password && (
             <Text style={{color: 'red'}}>{formik.errors.password}</Text>
+          )}
+          <CategoryPicker
+            selectedCategory={formik.values.departamento}
+            onCategoryChange={category =>
+              formik.setFieldValue('departamento', category)
+            }
+            visible={visible}
+            toggleModal={toggleModal}
+          />
+          {formik.errors.departamento && (
+            <Text style={{color: 'red'}}>{formik.errors.departamento}</Text>
           )}
         </Layout>
         <Layout>

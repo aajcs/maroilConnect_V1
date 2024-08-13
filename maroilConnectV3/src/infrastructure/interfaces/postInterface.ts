@@ -3,18 +3,22 @@ export interface PostInterface {
   titlePost: string;
   contentPost: string;
   commentsPost: any[];
-  likesPost: LikesPost[];
+  likesPost: any[];
   viewsPost: any[];
   mediaPost: mediaPost[];
   createdAt: Date;
   updatedAt: Date;
+  fechaAprobadoPost: Date;
   id: string;
+  estatusPost: string;
+  categoriaPost: string;
 }
 
 export interface AuthorPost {
   nombre: string;
   correo: string;
   id: string;
+  avatarUnicoUser: string;
 }
 export interface mediaPost {
   public_id: String;

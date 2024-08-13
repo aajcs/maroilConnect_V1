@@ -1,4 +1,5 @@
 // PostCard.tsx
+import {memo} from 'react';
 import {Post} from '../../../domain/entities/post';
 import {PostHeader} from './PostHeader';
 import {PostBody} from './PostBody';
@@ -10,52 +11,55 @@ import {updateCreateViewAction} from '../../../actions/view/updateCreateViewActi
 
 interface Props {
   post: Post;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   index: string;
   viewableItems: string[];
+  borrador: boolean;
 }
 
-export const PostCard = ({
-  post,
-  onEdit,
-  onDelete,
-  index,
-  viewableItems,
-}: Props) => {
-  const isViewable = viewableItems.includes(index.toString());
+export const PostCard = memo(
+  ({post, onEdit, onDelete, index, viewableItems, borrador}: Props) => {
+    const isViewable = viewableItems.includes(index.toString());
 
-  const colorScheme = useColorScheme();
-  const queryClient = useQueryClient();
-  const mutationView = useMutation({
-    mutationFn: async (data: Post) => {
-      await updateCreateViewAction({...data, id: post.id});
-      return data;
-    },
+    const colorScheme = useColorScheme();
+    const queryClient = useQueryClient();
+    const mutationView = useMutation({
+      mutationFn: async (data: Post) => {
+        await updateCreateViewAction({...data, id: post.id});
+        return data;
+      },
 
-    onSuccess: (data: Post) => {
-      if (data) {
-        queryClient.invalidateQueries({queryKey: ['posts', 'infinite']});
-      }
-    },
-  });
+      onSuccess: (data: Post) => {
+        if (data) {
+          queryClient.invalidateQueries({queryKey: ['posts', 'infinite']});
+          queryClient.invalidateQueries({queryKey: ['postsUser', 'infinite']});
+        }
+      },
+    });
 
-  return (
-    <Layout
-      style={[
-        styles.container,
-        {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
-      ]}>
-      <PostHeader post={post} onEdit={onEdit} onDelete={onDelete} />
-      <PostBody
-        post={post}
-        mutationView={mutationView}
-        isViewable={isViewable}
-      />
-      <PostFooter post={post} mutationView={mutationView} />
-    </Layout>
-  );
-};
+    return (
+      <Layout
+        style={[
+          styles.container,
+          {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
+        ]}>
+        <PostHeader post={post} onEdit={onEdit} onDelete={onDelete} />
+        <PostBody
+          post={post}
+          mutationView={mutationView}
+          isViewable={isViewable}
+        />
+
+        <PostFooter
+          post={post}
+          mutationView={mutationView}
+          borrador={borrador}
+        />
+      </Layout>
+    );
+  },
+);
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: '#fff',

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "117708664859",
+    "project_id": "maroilconnect",
+    "storage_bucket": "maroilconnect.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117708664859:android:a577f4a8a232a0ac4488be",
+        "android_client_info": {
+          "package_name": "com.maroilconnectv3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8GXOT3YvWXdJCCWus5qs6GE2pY7599o0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -10,6 +10,7 @@ import {Layout} from '@ui-kitten/components';
 import {ChatMessageList} from '../components/chat/ChatMessageList';
 import {ChatMessageForm} from '../components/chat/ChatMessageForm';
 import {socket} from '../utils/sockets';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const unreadMessagesController = new UnreadMessages();
 
@@ -19,7 +20,8 @@ export const ChatScreen = () => {
   const {
     params: {chat},
   } = useRoute();
-  const [messages, setMessages] = useState(null);
+  // const [messages, setMessages] = useState(null);
+  console.log('chat', chat);
 
   const {isLoading, data: chatMessageData} = useQuery({
     queryKey: ['chatMessage', chat._id],
@@ -46,13 +48,16 @@ export const ChatScreen = () => {
   // });
   useFocusEffect(
     useCallback(() => {
-      queryClient.invalidateQueries({queryKey: ['chatMessage', chat._id]});
+      const handleFocusEffect = async () => {
+        queryClient.invalidateQueries({queryKey: ['chatMessage', chat._id]});
+        await AsyncStorage.removeItem('ACTIVE_CHAT_ID');
+      };
+      handleFocusEffect();
     }, [queryClient, chat._id]),
   );
   useEffect(() => {
     socket?.emit('subscribe', chat._id);
     socket?.on('newMessage', message => {
-      console.log('newMessage', message);
       queryClient.invalidateQueries({queryKey: ['chatMessage', chat._id]});
     });
     return () => {
@@ -60,6 +65,17 @@ export const ChatScreen = () => {
       socket?.off('newMessage');
     };
   }, [queryClient, chat._id]);
+
+  useEffect(() => {
+    (async () => {
+      await AsyncStorage.setItem('ACTIVE_CHAT_ID', chat._id);
+    })();
+    return () => {
+      (async () => {
+        await AsyncStorage.removeItem('ACTIVE_CHAT_ID');
+      })();
+    };
+  }, [chat]);
   return (
     <>
       <CabeceraChat chat={{chat}} />

@@ -1,20 +1,30 @@
-import {Button, Icon, Layout, Text} from '@ui-kitten/components';
+import {Layout} from '@ui-kitten/components';
 import {useAuthStore} from '../store/auth/useAuthStore';
-import {getPosts} from '../../actions/posts/getPostsActions';
-import {useQuery} from '@tanstack/react-query';
+import {getPostsAprobados} from '../../actions/posts/getPostsActions';
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query';
 import {FullScreenLoader} from '../components/iu/FullScreenLoader';
 import {PostList} from '../components/posts/PostList';
 import {FullScreenAccessDenied} from '../components/iu/FullScreenAccessDenied';
 
 export const HomeScreen = () => {
-  const {logout, user} = useAuthStore();
+  const {user} = useAuthStore();
+  const {rolesMaroilConnect} = user || {}; // Add type guard to ensure 'user' is defined
 
-  console.log('chatMaroilConnect', user);
+  const hasNotRol = rolesMaroilConnect?.includes('NotRol');
 
-  const {isLoading, data: posts} = useQuery({
+  // const {isLoading, data: posts} = useQuery({
+  //   queryKey: ['posts', 'infinite'],
+  //   staleTime: 1000 * 60 * 5,
+  //   queryFn: () => getPostsStatusPublicado(),
+  // });
+
+  const {isLoading, data, fetchNextPage} = useInfiniteQuery({
     queryKey: ['posts', 'infinite'],
-    staleTime: 1000 * 60 * 5,
-    queryFn: () => getPosts(),
+    staleTime: 1000 * 60 * 60, // 1 hour
+    initialPageParam: 0,
+
+    queryFn: async params => await getPostsAprobados(params.pageParam),
+    getNextPageParam: (lastPage, allPages) => allPages.length,
   });
 
   return (
@@ -22,14 +32,18 @@ export const HomeScreen = () => {
       style={{
         flex: 1,
       }}>
-      <FullScreenAccessDenied />
-      {/* {isLoading ? <FullScreenLoader /> : <PostList post={posts || []} />} */}
-      {/* <FullScreenLoader /> */}
-      {/* <Text>{JSON.stringify(posts, null, 2)}</Text> */}
-      {/* <Icon name="facebook" /> */}
-      {/* <Button onPress={logout} accessoryLeft={<Icon name="log-out-outline" />}>
-        Cerrar secion
-      </Button> */}
+      {!hasNotRol ? (
+        isLoading ? (
+          <FullScreenLoader />
+        ) : (
+          <PostList
+            post={data?.pages.flat() || []}
+            fetchNextPage={fetchNextPage}
+          />
+        )
+      ) : (
+        <FullScreenAccessDenied />
+      )}
     </Layout>
   );
 };

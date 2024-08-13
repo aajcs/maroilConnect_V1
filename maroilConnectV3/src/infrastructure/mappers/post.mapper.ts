@@ -14,6 +14,9 @@ export class PostMapper {
       mediaPost: post.mediaPost,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
+      estatusPost: post.estatusPost,
+      categoriaPost: post.categoriaPost,
+      fechaAprobadoPost: post.fechaAprobadoPost,
     };
   }
 }

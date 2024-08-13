@@ -8,6 +8,7 @@ import {updateCreateChatAction} from '../../../actions/chat/updateCreateChatActi
 import {useNavigation} from '@react-navigation/native';
 import {Chat} from '../../../domain/entities/chat';
 import {useAuthStore} from '../../store/auth/useAuthStore';
+import {useState} from 'react';
 
 interface Props {
   usuario: Usuario;
@@ -19,29 +20,51 @@ export const UsuarioCardList = ({usuario}: Props) => {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const [isPressed, setIsPressed] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async (data: Chat) => {
-      await updateCreateChatAction(data);
-      return data;
+      const chatCrate = await updateCreateChatAction(data);
+      return chatCrate;
     },
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['chats', 'infinite']});
+    onSuccess: async chatCrate => {
+      // console.log('data', chatCrate.chatSave.id);
+
+      await queryClient.invalidateQueries({queryKey: ['chats', 'infinite']});
+      if (chatCrate.chatSave) {
+        navigation.navigate('chatUnico', {
+          screen: 'ChatScreen',
+          params: {chat: {...chatCrate.chatSave, _id: chatCrate.chatSave.id}},
+        });
+      }
+      if (chatCrate.chat) {
+        navigation.navigate('chatUnico', {
+          screen: 'ChatScreen',
+          params: {chat: {...chatCrate.chat, _id: chatCrate.chat.id}},
+        });
+      }
       navigation.goBack();
+    },
+    onSettled: () => {
+      setIsPressed(false);
     },
   });
   const createChar = () => {
     const {id: participanteOne} = user || {};
-    console.log('participanteOne', participanteOne);
     const {id: participanteTwo} = usuario;
-    console.log('participanteOne', participanteTwo);
     const data: Chat = {
       participanteOne,
       participanteTwo,
     };
 
     mutation.mutate(data);
+  };
+  const handlePress = () => {
+    if (!isPressed) {
+      setIsPressed(true);
+      createChar();
+    }
   };
   return (
     <Layout
@@ -52,17 +75,41 @@ export const UsuarioCardList = ({usuario}: Props) => {
       <TouchableOpacity
         key={usuario.id}
         style={styles.item}
-        onPress={() => {
-          createChar();
-        }} // Add this line;
+        onPress={handlePress} // Add this line;
       >
-        <Avatar
+        {usuario?.avatarUnicoUser && usuario.avatarUnicoUser ? (
+          <Avatar
+            style={styles.avatar}
+            shape="round"
+            source={{uri: usuario?.avatarUnicoUser}}
+            defaultSource={require('../../../assets/no-product-image.png')}
+          />
+        ) : (
+          <Layout
+            style={{
+              ...styles.avatar,
+
+              borderRadius: 50,
+              backgroundColor: '#ccc',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                textAlign: 'center', // Centra el texto
+                fontSize: 25, // Ajusta el tamaño del texto
+              }}>
+              {usuario?.nombre.substring(0, 2).toUpperCase()}
+            </Text>
+          </Layout>
+        )}
+        {/* <Avatar
           style={styles.avatar}
           shape="round"
           source={{
             uri: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/03/avatar-facebook-2632445.jpg?tf=3840x',
           }}
-        />
+        /> */}
         <Layout>
           <Text style={styles.name}>{usuario.nombre}</Text>
           <Text style={styles.email}>{usuario.correo}</Text>
@@ -89,7 +136,10 @@ const styles = StyleSheet.create({
     // paddingBottom: 50,
   },
   avatar: {
-    margin: 8,
+    // margin: 8,
+    width: 50,
+    height: 50,
+    marginRight: 10,
   },
   item: {
     flexDirection: 'row',

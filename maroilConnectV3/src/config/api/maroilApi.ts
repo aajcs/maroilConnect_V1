@@ -16,9 +16,9 @@ export const API_URL =
     : API_URL_ANDROID;
 const maroilApi = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // },
 });
 
 maroilApi.interceptors.request.use(async config => {
@@ -28,10 +28,11 @@ maroilApi.interceptors.request.use(async config => {
     // config.headers['Authorization'] = `Bearer ${token}`;
     // config.headers = config.headers || {};
     config.headers.Authorization = token;
-  } else {
-    config.headers.Authorization =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNGZlODZjMGNmOTE3YzY1OWE0NmU2MCIsImlhdCI6MTcxMDQ1Mzc2MH0.Mr3yZK-ZrHufIppPgiMUdETMHTTOq5dDsirJ1uWyq11';
   }
+  // else {
+  //   config.headers.Authorization =
+  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNGZlODZjMGNmOTE3YzY1OWE0NmU2MCIsImlhdCI6MTcxMDQ1Mzc2MH0.Mr3yZK-ZrHufIppPgiMUdETMHTTOq5dDsirJ1uWyq11';
+  // }
 
   return config;
 });

@@ -18,6 +18,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 import {Post} from '../../../domain/entities/post';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
@@ -28,6 +29,7 @@ import {MyIcon} from '../iu/MyIcon';
 import {useState} from 'react';
 import Video from 'react-native-video';
 import Toast from 'react-native-toast-message';
+import {CategoryPicker} from '../iu/CategoryPicker';
 
 interface Props {
   post: Post;
@@ -36,6 +38,7 @@ interface Props {
 export const PostForm = ({post, postIdRef}: Props) => {
   const [visible, setVisible] = useState(false);
   const [isloading, setIsLoading] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -43,7 +46,11 @@ export const PostForm = ({post, postIdRef}: Props) => {
   const mutation = useMutation({
     mutationFn: async (data: Post) => {
       setIsLoading(true);
-      await updateCreatePostAction({...data, id: post.id});
+      await updateCreatePostAction({
+        ...data,
+        id: post.id,
+        estatusPost: 'Borrador',
+      });
       return data;
     },
 
@@ -58,10 +65,9 @@ export const PostForm = ({post, postIdRef}: Props) => {
   const toggleModal = () => {
     setVisible(!visible);
   };
-  const categories = ['Category 1', 'Category 2', 'Category 3'];
 
   const formik = useFormik({
-    initialValues: {...post, category: 'Category 1'},
+    initialValues: {...post, categoriaPost: 'Maroil Connect'},
     onSubmit: values => {
       // Aquí puedes manejar la lógica de envío del formulario
       mutation.mutate(values);
@@ -69,13 +75,16 @@ export const PostForm = ({post, postIdRef}: Props) => {
   });
   const options = [
     {title: 'Cámara', icon: 'camera-outline'},
-    {title: 'Galeria', icon: 'camera-outline'},
+    {title: 'Galeria', icon: 'image-outline'},
     {title: 'Videos', icon: 'video-outline'},
-    {title: 'Biblioteca de Videos', icon: 'video-outline'},
-    {title: 'Eventos', icon: 'calendar-outline'},
-    {title: 'Encuesta', icon: 'question-mark-circle-outline'},
+    {title: 'Biblioteca de Videos', icon: 'film-outline'},
+    // {title: 'Eventos', icon: 'calendar-outline'},
+    // {title: 'Encuesta', icon: 'question-mark-circle-outline'},
   ];
-  const renderIcon = (name: string) => <MyIcon name={name} />;
+  const theme = useColorScheme();
+  const renderIcon = (name: string) => (
+    <MyIcon name={name} color={theme === 'light' ? '#002885' : ''} />
+  );
   // const renderTitle = (title: string) => (
   //   <Text style={{color: '#333', fontWeight: 'bold', textAlign: 'left'}}>
   //     {title}
@@ -188,6 +197,13 @@ export const PostForm = ({post, postIdRef}: Props) => {
       </View>
     );
   };
+
+  const handleTextChange = text => {
+    if (text.length <= 60) {
+      formik.handleChange('titlePost')(text);
+      setCharCount(text.length);
+    }
+  };
   return (
     <ScrollView nestedScrollEnabled={true}>
       <Layout style={styles.container}>
@@ -208,8 +224,11 @@ export const PostForm = ({post, postIdRef}: Props) => {
               Cancelar
             </Button>
           </Layout>
-          <Layout style={{flex: 1, alignItems: 'center'}}>
+          {/* <Layout>
             <Text category="s2">Crear Publicacion</Text>
+          </Layout> */}
+          <Layout style={{flex: 1, alignItems: 'center'}}>
+            <Text category="h6">Crear publicacion</Text>
           </Layout>
           <Layout style={{flexDirection: 'row', alignItems: 'center'}}>
             <Button
@@ -232,8 +251,10 @@ export const PostForm = ({post, postIdRef}: Props) => {
           style={{marginTop: 10}}
           placeholder="Titulo"
           value={formik.values.titlePost}
-          onChangeText={formik.handleChange('titlePost')}
+          onChangeText={handleTextChange}
+          maxLength={60}
         />
+        <Text style={{textAlign: 'right'}}>{charCount}/60</Text>
         <Input
           style={{marginTop: 10}}
           placeholder="Contenido"
@@ -242,63 +263,14 @@ export const PostForm = ({post, postIdRef}: Props) => {
           multiline={true}
           textStyle={{minHeight: 64}}
         />
-        {Platform.OS === 'ios' && (
-          <>
-            <Button
-              onPress={toggleModal}
-              appearance="outline"
-              status="basic"
-              style={{marginTop: 10}}>
-              {formik.values.category}
-            </Button>
-            <Modal
-              visible={visible}
-              transparent={true}
-              animationType="slide"
-              onRequestClose={toggleModal}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    backgroundColor: 'white',
-                    padding: 0,
-                    borderRadius: 10,
-                    width: '90%',
-                  }}>
-                  <Picker
-                    selectedValue={formik.values.category}
-                    onValueChange={itemValue =>
-                      formik.setFieldValue('category', itemValue)
-                    }>
-                    {categories.map((category, index) => (
-                      <Picker.Item
-                        label={category}
-                        value={category}
-                        key={index}
-                      />
-                    ))}
-                  </Picker>
-                  <Button onPress={toggleModal}>"Cerrar"</Button>
-                </View>
-              </View>
-            </Modal>
-          </>
-        )}
-        {Platform.OS !== 'ios' && (
-          <Picker
-            selectedValue={formik.values.category}
-            onValueChange={itemValue =>
-              formik.setFieldValue('category', itemValue)
-            }>
-            {categories.map((category, index) => (
-              <Picker.Item label={category} value={category} key={index} />
-            ))}
-          </Picker>
-        )}
+        <CategoryPicker
+          selectedCategory={formik.values.categoriaPost}
+          onCategoryChange={category =>
+            formik.setFieldValue('categoriaPost', category)
+          }
+          visible={visible}
+          toggleModal={toggleModal}
+        />
 
         {/* {options.map((option, index) => (
           <MenuItem
@@ -349,7 +321,7 @@ export const PostForm = ({post, postIdRef}: Props) => {
           ))}
         </ButtonGroup>
 
-        <Text>{JSON.stringify(formik.values, null, 2)}</Text>
+        {/* <Text>{JSON.stringify(formik.values, null, 2)}</Text> */}
       </Layout>
     </ScrollView>
   );

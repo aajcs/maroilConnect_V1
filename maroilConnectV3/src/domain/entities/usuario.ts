@@ -1,6 +1,7 @@
 export interface Usuario {
   nombre: string;
   correo: string;
+  departamento: string;
   user?: string;
   password: string;
   roles?: string[];
@@ -11,5 +12,11 @@ export interface Usuario {
   updatedAt?: Date;
   id?: string;
   chatMaroilConnect?: boolean;
-  rolesMaroilConnect?: [string];
+  rolesMaroilConnect?: string[];
+  avatarUser?: avatarUser[];
+  avatarUnicoUser?: string;
+}
+export interface avatarUser {
+  public_id: String;
+  url: String;
 }

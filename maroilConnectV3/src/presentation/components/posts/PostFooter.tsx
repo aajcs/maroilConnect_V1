@@ -8,10 +8,12 @@ import PostCommentsOne from './PostCommentsOne';
 interface Props {
   post: Post;
   mutationView: UseMutationResult<Post, Error, Post, unknown>;
+  borrador: boolean;
 }
 
-export const PostFooter = ({post, mutationView}: Props) => {
+export const PostFooter = ({post, mutationView, borrador}: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [modalVisibleComentarios, setModalVisibleComentarios] = useState(false);
   const shouldTruncate = post.contentPost.length > 100;
 
   const toggleExpanded = () => {
@@ -41,9 +43,20 @@ export const PostFooter = ({post, mutationView}: Props) => {
       ) : (
         <Text category="s1">{post.contentPost}</Text>
       )}
-
-      <PostStats post={post} mutationView={mutationView} />
-      <PostCommentsOne post={post} />
+      {!borrador && (
+        <>
+          <PostStats
+            post={post}
+            mutationView={mutationView}
+            modalVisibleComentarios={modalVisibleComentarios}
+            setModalVisibleComentarios={setModalVisibleComentarios}
+          />
+          <PostCommentsOne
+            post={post}
+            setModalVisibleComentarios={setModalVisibleComentarios}
+          />
+        </>
+      )}
     </Layout>
   );
 };

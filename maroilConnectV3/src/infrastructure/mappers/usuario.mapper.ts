@@ -17,6 +17,10 @@ export class UsuarioMapper {
       createdAt: usuario.createdAt,
       updatedAt: usuario.updatedAt,
       chatMaroilConnect: usuario.chatMaroilConnect,
+      rolesMaroilConnect: usuario.rolesMaroilConnect,
+      departamento: usuario.departamento,
+      avatarUser: usuario.avatarUser,
+      avatarUnicoUser: usuario.avatarUnicoUser,
     };
   }
 }

@@ -15,6 +15,8 @@ const returnUserToken = (data: LoginResponse) => {
     createdAt: data.faidUser.createdAt,
     updatedAt: data.faidUser.updatedAt,
     id: data.faidUser.id,
+    chatMaroilConnect: data.faidUser.chatMaroilConnect,
+    rolesMaroilConnect: data.faidUser.rolesMaroilConnect,
   };
 
   return {
@@ -33,6 +35,38 @@ export const authLogin = async (email: string, password: string) => {
       password,
     });
 
+    return returnUserToken(data);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+export const newTokenFcm = async (tokenFcm: string, user: any) => {
+  const {id} = user;
+  try {
+    // const {data} = await maroilApi.put<LoginResponse>(
+    //   `/usuario/tokenFcm/${id}`,
+    //   tokenFcm,
+    // );
+    const {data} = await maroilApi.put(`/usuario/newTokenFcm/${id}`, {
+      tokenFcm,
+    });
+    return returnUserToken(data);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+export const removeTokenFcm = async (tokenFcm: string, user: any) => {
+  const {id} = user;
+  try {
+    // const {data} = await maroilApi.put<LoginResponse>(
+    //   `/usuario/tokenFcm/${id}`,
+    //   tokenFcm,
+    // );
+    const {data} = await maroilApi.put(`/usuario/removeTokenFcm/${id}`, {
+      tokenFcm,
+    });
     return returnUserToken(data);
   } catch (error) {
     console.log(error);

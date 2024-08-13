@@ -8,5 +8,6 @@ export class UnreadMessages {
 
   async setTotalReadMessages(id, total) {
     await AsyncStorage.setItem(`${id}_read`, JSON.stringify(total));
+    await AsyncStorage.setItem(`totalMessage`, JSON.stringify(total));
   }
 }

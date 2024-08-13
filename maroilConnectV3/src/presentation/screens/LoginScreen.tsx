@@ -1,5 +1,5 @@
 import {Button, Input, Layout, Text} from '@ui-kitten/components';
-import {Alert, ScrollView, useWindowDimensions} from 'react-native';
+import {Alert, Image, ScrollView, useWindowDimensions} from 'react-native';
 import {MyIcon} from '../components/iu/MyIcon';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParams} from '../navigations/MenuPrincipalNavigator';
@@ -36,7 +36,15 @@ export const LoginScreen = ({navigation}: Props) => {
         // alignItems: 'center',
       }}>
       <ScrollView style={{marginHorizontal: 40}}>
-        <Layout style={{paddingTop: height * 0.35}}>
+        {/* <Layout style={{alignItems: 'center', paddingTop: height * 0.35}}>
+        </Layout> */}
+        <Layout style={{paddingTop: height * 0.15}}>
+          <Layout style={{alignItems: 'center', paddingBottom: 50}}>
+            <Image
+              source={require('../../assets/logoConnect.svg')}
+              style={{width: 100, height: 100}}
+            />
+          </Layout>
           <Text category="h1">Ingresar</Text>
           <Text category="p2">Por favor, ingrese para continuar</Text>
         </Layout>

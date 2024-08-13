@@ -5,6 +5,7 @@ import {useAuthStore} from '../../store/auth/useAuthStore';
 import {Avatar, Layout, Text, TopNavigationAction} from '@ui-kitten/components';
 import {Chat} from '../../../domain/entities/chat';
 import {MyIcon} from '../iu/MyIcon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface CabeceraChatProps {
   chat: Chat;
@@ -57,18 +58,23 @@ export function CabeceraChat({chat}: CabeceraChatProps) {
         <Layout style={styles.content}>
           <Layout style={styles.info}>
             <TopNavigationAction
-              icon={<MyIcon name="chevron-left" />}
-              onPress={navigation.goBack}
+              icon={<MyIcon name="chevron-left" width={40} height={40} />}
+              onPress={async () => {
+                await AsyncStorage.removeItem('ACTIVE_CHAT_ID');
+
+                navigation.goBack();
+              }}
+              style={{marginRight: -5}}
             />
 
             {userChat && (
               <Pressable onPress={() => {}} style={styles.info}>
-                {userChat?.avatar ? (
+                {userChat?.avatarUnicoUser ? (
                   <Avatar
                     style={styles.avatar}
                     shape="round"
                     source={{
-                      uri: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/03/avatar-facebook-2632445.jpg?tf=3840x',
+                      uri: userChat?.avatarUnicoUser,
                     }}
                   />
                 ) : (
@@ -81,7 +87,7 @@ export function CabeceraChat({chat}: CabeceraChatProps) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text style={styles.avatar}>
+                    <Text style={{fontSize: 20}}>
                       {userChat.nombre.substring(0, 2).toUpperCase()}
                     </Text>
                   </Layout>
@@ -96,10 +102,10 @@ export function CabeceraChat({chat}: CabeceraChatProps) {
               padding={0}
               onPress={openCloseDelete}
             /> */}
-            <TopNavigationAction
+            {/* <TopNavigationAction
               icon={<MyIcon name="trash" />}
               onPress={() => {}}
-            />
+            /> */}
           </Layout>
         </Layout>
       </SafeAreaView>
@@ -126,7 +132,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    // paddingHorizontal: 0,
   },
   info: {
     flexDirection: 'row',
@@ -134,9 +140,12 @@ export const styles = StyleSheet.create({
   },
   avatar: {
     marginLeft: 30,
+    width: 50,
+    height: 50,
   },
   identity: {
     // color: '#fff',
+    marginLeft: 10,
     fontWeight: 'bold',
     fontSize: 16,
   },

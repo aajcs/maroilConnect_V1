@@ -5,17 +5,19 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {MyIcon} from '../components/iu/MyIcon';
 import {Button, Layout} from '@ui-kitten/components';
-import {getUsersActions} from '../../actions/auth/getUsersActions';
+import {getUsersBuscarChatActions} from '../../actions/auth/getUsersActions';
 import {useQuery} from '@tanstack/react-query';
 import {UsuarioList} from '../components/usuario/UsuarioList';
 import {FullScreenLoader} from '../components/iu/FullScreenLoader';
 import {BuscarChat} from '../components/chat/BuscarChat';
+import {useAuthStore} from '../store/auth/useAuthStore';
 
 export const CreateChatScreen = () => {
+  const {user} = useAuthStore();
   const {isLoading, data: usuarios} = useQuery({
     queryKey: ['usuarios', 'infinite'],
     staleTime: 1000 * 60 * 5,
-    queryFn: () => getUsersActions(),
+    queryFn: () => getUsersBuscarChatActions(user!),
   });
   const [usuarioBuscar, setUsuarioBuscar] = useState(usuarios || []);
 

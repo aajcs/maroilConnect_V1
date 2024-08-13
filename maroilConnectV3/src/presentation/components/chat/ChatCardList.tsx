@@ -1,8 +1,13 @@
 // ChatCardList.tsx
 // import {Post} from '../../../domain/entities/post';
 import {useEffect, useState} from 'react';
-import {Avatar, Layout, Text} from '@ui-kitten/components';
-import {StyleSheet, TouchableOpacity, useColorScheme} from 'react-native';
+import {Avatar, Layout, Text, useTheme} from '@ui-kitten/components';
+import {
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
 import {Chat} from '../../../domain/entities/chat';
 import {useAuthStore} from '../../store/auth/useAuthStore';
 import {DateTime} from 'luxon';
@@ -12,6 +17,7 @@ import {socket} from '../../utils/sockets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {UnreadMessages} from '../../../actions/chat/UnreadMessagesActions';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 interface Props {
   chat: Chat;
@@ -23,9 +29,10 @@ const unreadMessagesController = new UnreadMessages();
 export const ChatCardList = ({chat, upTopChat}: Props) => {
   const {participanteOne, participanteTwo} = chat;
   const navigation = useNavigation();
+  const theme = useTheme();
 
   const [lastMessage, setLastMessage] = useState(null);
-  // console.log('lastMessage', lastMessage.messageChatMessage);
+  const [showAlert, setShowAlert] = useState(false);
 
   const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
@@ -36,7 +43,7 @@ export const ChatCardList = ({chat, upTopChat}: Props) => {
   const colorScheme = useColorScheme();
   const createChat = () => {
     setTotalUnreadMessages(0);
-    navigation.navigate('pantallas', {screen: 'ChatScreen', params: {chat}});
+    navigation.navigate('chatUnico', {screen: 'ChatScreen', params: {chat}});
   };
 
   useEffect(() => {
@@ -79,8 +86,9 @@ export const ChatCardList = ({chat, upTopChat}: Props) => {
         upTopChat(chat._id);
         setLastMessage(newMessageNotify1);
 
-        const activeChatId = await AsyncStorage.getItem('ENV.ACTIVE_CHAT_ID');
-        if (activeChatId !== newMessageNotify1.chat) {
+        const activeChatId = await AsyncStorage.getItem('ACTIVE_CHAT_ID');
+
+        if (activeChatId !== newMessageNotify1.chatIdChatMessage) {
           setTotalUnreadMessages(prevState => prevState + 1);
         }
       }
@@ -93,32 +101,58 @@ export const ChatCardList = ({chat, upTopChat}: Props) => {
         styles.container,
         {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
       ]}>
+      <AwesomeAlert
+        // overlayStyle={{backgroundColor: theme['background-basic-color-1']}}
+        titleStyle={{color: theme['text-basic-color']}}
+        messageStyle={{color: theme['text-basic-color']}}
+        contentContainerStyle={{
+          backgroundColor: theme['background-basic-color-1'],
+        }}
+        show={showAlert}
+        title="Eliminar chat"
+        message="¿Quieres eliminar este chat?"
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="No, cancelar"
+        confirmText="Sí, confirmar"
+        onCancelPressed={() => {
+          setShowAlert(false);
+        }}
+        onConfirmPressed={() => {
+          console.log('Avatar confirmado');
+        }}
+        onDismiss={() => {
+          setShowAlert(false);
+        }}
+      />
       <TouchableOpacity
         key={chat._id}
         style={styles.item}
         onPress={() => {
           createChat();
         }} // Add this line;
-      >
-        {userChat?.avatar ? (
+        onLongPress={() => {
+          setShowAlert(true);
+        }}>
+        {userChat?.avatarUnicoUser ? (
           <Avatar
             style={styles.avatar}
             shape="round"
             source={{
-              uri: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/03/avatar-facebook-2632445.jpg?tf=3840x',
+              uri: userChat.avatarUnicoUser,
             }}
+            defaultSource={require('../../../assets/no-product-image.png')}
           />
         ) : (
           <Layout
             style={{
-              width: 50,
-              height: 50,
+              ...styles.avatar,
               borderRadius: 25,
               backgroundColor: '#ccc',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text style={styles.avatar}>
+            <Text style={{fontSize: 20}}>
               {userChat.nombre.substring(0, 2).toUpperCase()}
             </Text>
           </Layout>
@@ -175,11 +209,14 @@ const styles = StyleSheet.create({
     // paddingBottom: 50,
   },
   avatar: {
-    margin: 8,
+    // margin: 8,
+    width: 50,
+    height: 50,
+    marginRight: 10,
   },
   item: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: '#333',
     paddingVertical: 3,
     alignItems: 'center',
@@ -199,6 +236,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // borderBottomWidth: 1,
     // borderBottomColor: '#333',
+    // marginLeft: 10,
     paddingVertical: 10,
     justifyContent: 'space-between',
     height: '100%',

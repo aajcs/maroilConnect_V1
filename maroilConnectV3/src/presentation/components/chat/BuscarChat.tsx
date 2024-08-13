@@ -34,6 +34,7 @@ export function BuscarChat({data, setData}: SearchProps) {
         // variant="unstyled"
         style={styles.input}
         onChangeText={onSearch}
+        // height={30}
       />
     </Layout>
   );
@@ -42,11 +43,12 @@ export function BuscarChat({data, setData}: SearchProps) {
 const styles = StyleSheet.create({
   content: {
     padding: 10,
+    width: 'auto',
   },
   input: {
     // backgroundColor: '#29292b',
     // color: '#fff',
-    fontSize: 16,
+    fontSize: 26,
     borderRadius: 10,
   },
 });

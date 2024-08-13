@@ -20,6 +20,10 @@ export const MenuStackChatNavigation = () => {
         //  options={{cardStyleInterpolator: fadeAnimation}}
         name="ChatScreens"
         component={ChatsScreen}
+        options={{
+          title: 'Chats',
+          headerShown: false,
+        }}
       />
       <Stack.Screen
         name="CreateChatScreen"
@@ -35,9 +39,10 @@ export const MenuStackChatNavigation = () => {
         name="ChatScreen"
         component={ChatScreen}
         options={{
+          headerShown: false,
           title: 'Nuevo Chat',
           presentation: 'modal',
-          headerLeft: null,
+          // headerLeft: null,
 
           // headerShown: false,
           // cardStyle: {backgroundColor: 'transparent', opacity: 0.9},
