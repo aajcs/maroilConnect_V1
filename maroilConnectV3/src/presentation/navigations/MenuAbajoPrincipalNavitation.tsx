@@ -110,7 +110,7 @@ export const MenuAbajoPrincipalNavitation: React.FC = () => {
       <Tab.Screen
         name="HomeScreen"
         component={HomeScreen}
-        options={{
+        options={({navigation}) => ({
           title: 'Inicio',
           tabBarLabel: ({focused, color, position}) => (
             <Text
@@ -120,7 +120,22 @@ export const MenuAbajoPrincipalNavitation: React.FC = () => {
               Inicio
             </Text>
           ),
-        }}
+          listeners: {
+            tabPress: e => {
+              // Prevent default action
+              console.log('clicked');
+              e.preventDefault();
+
+              // Get the current screen's params
+              const params = navigation
+                .dangerouslyGetState()
+                .routes.find(r => r.name === 'HomeScreen').params;
+
+              // Update the `tabPressed` state in the `HomeScreen` component
+              params?.setTabPressed(true);
+            },
+          },
+        })}
       />
 
       <Tab.Screen
@@ -162,10 +177,14 @@ export const MenuAbajoPrincipalNavitation: React.FC = () => {
         //       routes: [{name: 'PublicarScreen', params: {postId: post.id}}],
         //     });
         //   },
-        // }}
+        // }}colaborador
+moderador
+administrador
       /> */}
       {user?.rolesMaroilConnect.some(role =>
-        ['admin', 'superadmin', 'colaborador'].includes(role),
+        ['administrador', 'superadmin', 'colaborador', 'moderador'].includes(
+          role,
+        ),
       ) && (
         <Tab.Screen
           name="Publicar"

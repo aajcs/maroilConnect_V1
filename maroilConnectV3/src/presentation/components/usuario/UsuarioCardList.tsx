@@ -9,6 +9,8 @@ import {useNavigation} from '@react-navigation/native';
 import {Chat} from '../../../domain/entities/chat';
 import {useAuthStore} from '../../store/auth/useAuthStore';
 import {useState} from 'react';
+import {useConfigStore} from '../../store/iu/useConfigStore';
+import {AvatarNombre} from '../iu/AvatarNombre';
 
 interface Props {
   usuario: Usuario;
@@ -17,6 +19,8 @@ interface Props {
 
 export const UsuarioCardList = ({usuario}: Props) => {
   const {user} = useAuthStore();
+  const {checked} = useConfigStore();
+
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -66,50 +70,17 @@ export const UsuarioCardList = ({usuario}: Props) => {
       createChar();
     }
   };
+
   return (
     <Layout
-      style={[
-        styles.container,
-        {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
-      ]}>
+      style={[styles.container, {shadowColor: checked ? '#fff' : '#000'}]}>
       <TouchableOpacity
         key={usuario.id}
         style={styles.item}
         onPress={handlePress} // Add this line;
       >
-        {usuario?.avatarUnicoUser && usuario.avatarUnicoUser ? (
-          <Avatar
-            style={styles.avatar}
-            shape="round"
-            source={{uri: usuario?.avatarUnicoUser}}
-            defaultSource={require('../../../assets/no-product-image.png')}
-          />
-        ) : (
-          <Layout
-            style={{
-              ...styles.avatar,
+        {usuario && <AvatarNombre usuario={usuario} />}
 
-              borderRadius: 50,
-              backgroundColor: '#ccc',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                textAlign: 'center', // Centra el texto
-                fontSize: 25, // Ajusta el tamaño del texto
-              }}>
-              {usuario?.nombre.substring(0, 2).toUpperCase()}
-            </Text>
-          </Layout>
-        )}
-        {/* <Avatar
-          style={styles.avatar}
-          shape="round"
-          source={{
-            uri: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/media/image/2022/03/avatar-facebook-2632445.jpg?tf=3840x',
-          }}
-        /> */}
         <Layout>
           <Text style={styles.name}>{usuario.nombre}</Text>
           <Text style={styles.email}>{usuario.correo}</Text>

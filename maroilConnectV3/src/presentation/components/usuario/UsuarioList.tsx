@@ -1,16 +1,18 @@
-import {Layout, List} from '@ui-kitten/components';
+import {Layout, List, Text} from '@ui-kitten/components';
 import {useContext, useRef, useState} from 'react';
 import {Animated, RefreshControl} from 'react-native';
 import {useQueryClient} from '@tanstack/react-query';
 import {TabBarVisibleContext} from '../../providers/TabBarVisibleContext';
 import {Usuario} from '../../../domain/entities/usuario';
 import {UsuarioCardList} from './UsuarioCardList';
+import {UsuarioCardListAdministracion} from './UsuarioCardListAdministracion';
 
 interface Props {
   usuarios: Usuario[];
+  administracion: boolean;
 }
 
-export const UsuarioList = ({usuarios}: Props) => {
+export const UsuarioList = ({usuarios, administracion}: Props) => {
   const queryClient = useQueryClient();
   const scrollY = useContext(TabBarVisibleContext);
   const previousScrollY = useRef(0);
@@ -23,25 +25,14 @@ export const UsuarioList = ({usuarios}: Props) => {
   const onPullToRefresh = async () => {
     setIsRefreshing(true);
     queryClient.invalidateQueries({queryKey: ['usuarios', 'infinite']});
+    queryClient.invalidateQueries({
+      queryKey: ['usuariosAdministracion', 'infinite'],
+    });
     setIsRefreshing(false);
-  };
-
-  const handleScroll = (event: any) => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
-    const isScrollingDown = currentScrollY > previousScrollY.current;
-    previousScrollY.current = currentScrollY;
-
-    Animated.spring(scrollY, {
-      toValue: isScrollingDown ? 1 : -1,
-      tension: 25,
-      friction: 10,
-      useNativeDriver: false,
-    }).start();
   };
 
   return (
     <List
-      onScroll={handleScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
@@ -50,10 +41,19 @@ export const UsuarioList = ({usuarios}: Props) => {
       style={{padding: 0}}
       data={usuarios}
       keyExtractor={(item, index) => `${item.id}-${index}`}
-      renderItem={({item, index}) => (
-        <UsuarioCardList usuario={item} index={`${item.id}-${index}`} />
+      renderItem={({item, index}) =>
+        administracion ? (
+          <UsuarioCardListAdministracion
+            usuario={item}
+            index={`${item.id}-${index}`}
+          />
+        ) : (
+          <UsuarioCardList usuario={item} index={`${item.id}-${index}`} />
+        )
+      }
+      ListFooterComponent={() => (
+        <Layout style={{height: 100, backgroundColor: 'trasparente'}} />
       )}
-      ListFooterComponent={() => <Layout style={{height: 100}} />}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={onPullToRefresh} />
       }

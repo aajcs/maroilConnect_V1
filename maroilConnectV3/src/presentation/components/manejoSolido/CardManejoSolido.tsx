@@ -11,12 +11,14 @@ import Collapsible from 'react-native-collapsible';
 import {MyIcon} from '../iu/MyIcon';
 import {getRelativeTimeEspecifico} from '../../utils/timeUtil';
 import {ManejoSolido} from '../../../domain/entities/manejoSolido';
+import {useConfigStore} from '../../store/iu/useConfigStore';
 
 interface CardManejoSolidoProps {
   data: ManejoSolido;
 }
 
 export const CardManejoSolido = ({data}: CardManejoSolidoProps) => {
+  const {checked} = useConfigStore();
   const [isCollapsedGeneral, setIsCollapsedGeneral] = useState(true);
   const [isCollapsedCarga, setIsCollapsedCarga] = useState(true);
   const [isCollapsedGom, setIsCollapsedGom] = useState(false);
@@ -27,7 +29,7 @@ export const CardManejoSolido = ({data}: CardManejoSolidoProps) => {
 
   const formatDate = (dateString: string | number | Date) => {
     const date = new Date(dateString);
-    return format(date, 'dd/MM/yyyy');
+    return format(date, 'dd/MM/yyyy hh:mm a');
   };
 
   const formatNumber = (number: number) => {
@@ -40,7 +42,7 @@ export const CardManejoSolido = ({data}: CardManejoSolidoProps) => {
         styles.card,
         {
           backgroundColor: theme['background-basic-color-1'],
-          shadowColor: colorScheme !== 'dark' ? '#000' : '#fff',
+          shadowColor: checked ? '#fff' : '#000',
         },
       ]}>
       <Layout style={styles.header}>
@@ -54,7 +56,7 @@ export const CardManejoSolido = ({data}: CardManejoSolidoProps) => {
           Act:{' '}
           {format(
             data.reporteCargaGOM[ultimoRegistro].updatedAt,
-            'dd/MM HH:mm',
+            'dd/MM HH:mm a',
           )}
         </Text>
       </Layout>
@@ -75,7 +77,7 @@ export const CardManejoSolido = ({data}: CardManejoSolidoProps) => {
         </TouchableOpacity>
         <Collapsible collapsed={isCollapsedGeneral}>
           <Layout style={styles.row}>
-            <Text category="p1">Fecha de Atraco:</Text>
+            <Text category="p1">Fecha de Atraque:</Text>
             <Text category="p1">
               {data.fechaAtraco ? formatDate(data.fechaAtraco) : 'Sin Fecha'}
             </Text>

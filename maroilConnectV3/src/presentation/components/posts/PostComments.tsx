@@ -7,11 +7,9 @@ import {
   Modal,
   Avatar,
   Text,
+  Button,
 } from '@ui-kitten/components';
-import {Post} from '../../../domain/entities/post';
-import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {updateCreateCommentAction} from '../../../actions/coments/updateCreateCommentAction';
-import {Button} from '@ui-kitten/components';
+import {TouchableWithoutFeedback} from '@ui-kitten/components/devsupport';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -19,8 +17,14 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {TouchableWithoutFeedback} from '@ui-kitten/components/devsupport';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import * as yup from 'yup';
+
+import {Post} from '../../../domain/entities/post';
+import {updateCreateCommentAction} from '../../../actions/coments/updateCreateCommentAction';
 import {getRelativeTime} from '../../utils/timeUtil';
+import {AvatarNombre} from '../iu/AvatarNombre';
+import FastImage from 'react-native-fast-image';
 
 interface Props {
   post: Post;
@@ -31,6 +35,7 @@ interface Props {
 const PostComments = ({post, visible, onClose}: Props) => {
   const {height: viewportHeight} = useWindowDimensions();
   const [text, setText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const listRef = useRef(null);
 
   const queryClient = useQueryClient();
@@ -50,26 +55,34 @@ const PostComments = ({post, visible, onClose}: Props) => {
       if (data) {
         queryClient.invalidateQueries({queryKey: ['posts', 'infinite']});
         queryClient.invalidateQueries({queryKey: ['postsUser', 'infinite']});
+        setIsLoading(false);
       }
     },
   });
 
   const handleAddComment = () => {
-    mutation.mutate({post, text});
-    setText('');
-  };
-  // useEffect(() => {
-  //   if (listRef.current) {
-  //     listRef.current.scrollToEnd({animated: true});
-  //   }
-  // }, [post.commentsPost]);
+    const schema = yup.object().shape({
+      text: yup.string().required('El comentario no puede estar vacío'),
+    });
 
-  const renderComment = ({item}) => {
+    schema
+      .validate({text})
+      .then(() => {
+        setIsLoading(true);
+        mutation.mutate({post, text});
+        setText('');
+      })
+      .catch(error => {
+        console.log(error.errors);
+      });
+  };
+
+  const renderComment = ({item}: any) => {
     return (
       <ListItem
         style={{
           marginVertical: 5,
-          backgroundColor: 'rgba(143, 155, 179, 0.54)',
+          backgroundColor: 'rgba(143, 155, 179, 0.34)',
           // maxWidth: '80%',
           borderRadius: 10,
           paddingVertical: 6,
@@ -78,32 +91,7 @@ const PostComments = ({post, visible, onClose}: Props) => {
         title={item.authorComment.nombre}
         description={item.contentComment}
         accessoryLeft={() =>
-          item.authorComment?.avatarUnicoUser ? (
-            <Avatar
-              style={styles.avatar}
-              shape="round"
-              source={{uri: item.authorComment?.avatarUnicoUser}}
-              defaultSource={require('../../../assets/no-product-image.png')}
-            />
-          ) : (
-            <Layout
-              style={{
-                ...styles.avatar,
-
-                borderRadius: 50,
-                backgroundColor: '#ccc',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  textAlign: 'center', // Centra el texto
-                  fontSize: 25, // Ajusta el tamaño del texto
-                }}>
-                {item.authorComment?.nombre.substring(0, 2).toUpperCase()}
-              </Text>
-            </Layout>
-          )
+          item.authorComment && <AvatarNombre usuario={item.authorComment} />
         }
         accessoryRight={() => (
           <Text style={{fontSize: 10, paddingHorizontal: 2}}>
@@ -146,14 +134,10 @@ const PostComments = ({post, visible, onClose}: Props) => {
           }}>
           <List
             inverted
-            // ref={listRef}
             data={post.commentsPost}
             renderItem={renderComment}
             keyExtractor={item => item.id.toString()}
             showsVerticalScrollIndicator={false}
-            // onContentSizeChange={() => {
-            //   listRef.current?.scrollToEnd({animated: true});
-            // }}
           />
         </Layout>
         <Input
@@ -168,45 +152,57 @@ const PostComments = ({post, visible, onClose}: Props) => {
   );
 };
 
-export default PostComments;
-
 const styles = StyleSheet.create({
-  container: {
-    // backgroundColor: '#fff',
-    // borderRadius: 8,
-    // margin: 5,
-    // padding: 0,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 4,
-    // elevation: 5,
+  listItem: {
+    marginVertical: 5,
+    backgroundColor: 'rgba(143, 155, 179, 0.54)',
+    borderRadius: 10,
+    paddingVertical: 6,
     paddingHorizontal: 10,
-    // marginBottom: 50,
-    // paddingBottom: 50,
   },
   avatar: {
-    // margin: 8,
     width: 50,
     height: 50,
   },
-  item: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    paddingVertical: 3,
+  layout: {
+    borderRadius: 50,
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  name: {
-    fontWeight: '600',
-    // color: '#fff',
-    fontSize: 16,
+  text: {
+    textAlign: 'center',
+    fontSize: 25,
   },
-  email: {
-    // color: '#fff',
-    opacity: 0.6,
-    marginTop: 2,
+  textSmall: {
+    fontSize: 10,
+    paddingHorizontal: 2,
+  },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modal: {
+    height: '100%',
+    width: '100%',
+    flex: 1,
+  },
+  layoutTouchable: {
+    height: '100%',
+    backgroundColor: 'transparent',
+  },
+  keyboardAvoidingView: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+  },
+  layoutKeyboard: {
+    maxHeight: 400,
+    alignContent: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  layoutBottom: {
+    height: 20,
   },
 });
+export default PostComments;

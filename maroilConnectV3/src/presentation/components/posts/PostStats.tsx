@@ -1,12 +1,5 @@
 // PostStats.tsx
-import {
-  Avatar,
-  Button,
-  Layout,
-  Modal,
-  Text,
-  useTheme,
-} from '@ui-kitten/components';
+import {Button, Layout, Modal, Text, useTheme} from '@ui-kitten/components';
 import {StatItem} from './StatItem';
 import {Post} from '../../../domain/entities/post';
 import {
@@ -22,6 +15,7 @@ import PostComments from './PostComments';
 import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
 import {getRelativeTime} from '../../utils/timeUtil';
 import {useNavigation} from '@react-navigation/native';
+import {AvatarNombre} from '../iu/AvatarNombre';
 
 interface Props {
   post: Post;
@@ -190,34 +184,10 @@ export const PostStats = ({
                         marginVertical: 2,
                         borderRadius: 5,
                       }}>
-                      {like.authorLike && like.authorLike.avatarUnicoUser ? (
-                        <Avatar
-                          style={styles.avatar}
-                          shape="round"
-                          source={{uri: like.authorLike?.avatarUnicoUser}}
-                          defaultSource={require('../../../assets/no-product-image.png')}
-                        />
-                      ) : (
-                        <Layout
-                          style={{
-                            ...styles.avatar,
-
-                            borderRadius: 50,
-                            backgroundColor: '#ccc',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Text
-                            style={{
-                              textAlign: 'center', // Centra el texto
-                              fontSize: 25, // Ajusta el tamaño del texto
-                            }}>
-                            {like.authorLike.nombre
-                              .substring(0, 2)
-                              .toUpperCase()}
-                          </Text>
-                        </Layout>
+                      {like.authorLike && (
+                        <AvatarNombre usuario={like.authorLike} />
                       )}
+
                       <Layout>
                         <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                           {like.authorLike.nombre}
@@ -284,14 +254,14 @@ export const PostStats = ({
                   // marginLeft: -20,
                   marginRight: 10,
                 }}>
-                <MyIcon name="close" white />
+                <MyIcon name="close" />
               </Button>
               <Text style={{fontSize: 20, fontWeight: 'bold', paddingRight: 4}}>
                 Visto por
               </Text>
               <Text
                 style={{fontSize: 18, fontStyle: 'italic', marginLeft: 'auto'}}>
-                {post.likesPost?.length ?? 0} vistas
+                {post.viewsPost?.length ?? 0} vistas
               </Text>
             </Layout>
             <Layout
@@ -315,34 +285,10 @@ export const PostStats = ({
                         marginVertical: 2,
                         borderRadius: 5,
                       }}>
-                      {view.authorView && view.authorView.avatarUnicoUser ? (
-                        <Avatar
-                          style={styles.avatar}
-                          shape="round"
-                          source={{uri: view.authorView?.avatarUnicoUser}}
-                          defaultSource={require('../../../assets/no-product-image.png')}
-                        />
-                      ) : (
-                        <Layout
-                          style={{
-                            ...styles.avatar,
-
-                            borderRadius: 50,
-                            backgroundColor: '#ccc',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Text
-                            style={{
-                              textAlign: 'center', // Centra el texto
-                              fontSize: 25, // Ajusta el tamaño del texto
-                            }}>
-                            {view.authorView.nombre
-                              .substring(0, 2)
-                              .toUpperCase()}
-                          </Text>
-                        </Layout>
+                      {view.authorView && (
+                        <AvatarNombre usuario={view.authorView} />
                       )}
+
                       <Layout>
                         <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                           {view.authorView.nombre}

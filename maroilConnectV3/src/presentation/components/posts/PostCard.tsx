@@ -8,6 +8,7 @@ import {Layout} from '@ui-kitten/components';
 import {StyleSheet, useColorScheme} from 'react-native';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {updateCreateViewAction} from '../../../actions/view/updateCreateViewAction';
+import {useConfigStore} from '../../store/iu/useConfigStore';
 
 interface Props {
   post: Post;
@@ -21,6 +22,7 @@ interface Props {
 export const PostCard = memo(
   ({post, onEdit, onDelete, index, viewableItems, borrador}: Props) => {
     const isViewable = viewableItems.includes(index.toString());
+    const {checked} = useConfigStore();
 
     const colorScheme = useColorScheme();
     const queryClient = useQueryClient();
@@ -40,10 +42,7 @@ export const PostCard = memo(
 
     return (
       <Layout
-        style={[
-          styles.container,
-          {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
-        ]}>
+        style={[styles.container, {shadowColor: checked ? '#fff' : '#000'}]}>
         <PostHeader post={post} onEdit={onEdit} onDelete={onDelete} />
         <PostBody
           post={post}

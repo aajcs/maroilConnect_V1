@@ -80,7 +80,6 @@ export const PostBody = ({post, mutationView, isViewable}: Props) => {
           initialSlideIndex={selectedImageIndex}
           onSlideChange={setActiveSlide}
           activeSlide={activeSlide}
-          onSlideChange={setActiveSlide}
         />
       </Layout>
       {pagination()}

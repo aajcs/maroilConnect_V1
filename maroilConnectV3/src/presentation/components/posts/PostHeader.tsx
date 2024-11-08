@@ -6,6 +6,7 @@ import {StyleSheet, Touchable} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {useAuthStore} from '../../store/auth/useAuthStore';
+import {AvatarNombre} from '../iu/AvatarNombre';
 
 interface Props {
   post: Post;
@@ -26,32 +27,7 @@ export const PostHeader = ({post, onEdit, onDelete}: Props) => {
           });
         }}
         style={{flexDirection: 'row'}}>
-        {post.authorPost?.avatarUnicoUser ? (
-          <Avatar
-            style={styles.avatar}
-            shape="round"
-            source={{uri: post.authorPost?.avatarUnicoUser}}
-            defaultSource={require('../../../assets/no-product-image.png')}
-          />
-        ) : (
-          <Layout
-            style={{
-              ...styles.avatar,
-
-              borderRadius: 50,
-              backgroundColor: '#ccc',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                textAlign: 'center', // Centra el texto
-                fontSize: 25, // Ajusta el tamaño del texto
-              }}>
-              {post.authorPost?.nombre.substring(0, 2).toUpperCase()}
-            </Text>
-          </Layout>
-        )}
+        {post.authorPost && <AvatarNombre usuario={post.authorPost} />}
       </TouchableOpacity>
 
       <Layout>
@@ -79,7 +55,7 @@ export const PostHeader = ({post, onEdit, onDelete}: Props) => {
         </Text>
       </Layout>
       {(user?.rolesMaroilConnect.some(role =>
-        ['admin', 'superadmin', 'colaborador'].includes(role),
+        ['administrador', 'superadmin', 'moderador'].includes(role),
       ) ||
         post.authorPost.id === user?.id) && (
         <MenuActions

@@ -17,6 +17,7 @@ const returnUserToken = (data: LoginResponse) => {
     id: data.faidUser.id,
     chatMaroilConnect: data.faidUser.chatMaroilConnect,
     rolesMaroilConnect: data.faidUser.rolesMaroilConnect,
+    avatarUnicoUser: data.faidUser.avatarUnicoUser,
   };
 
   return {

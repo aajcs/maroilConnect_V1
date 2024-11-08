@@ -23,12 +23,18 @@ const updatePost = async (post: Partial<Post>) => {
 const createPost = async (post: Partial<Post>) => {
   const {authorPost, mediaPost, ...rest} = post;
 
+  console.log('rest', rest);
+
   try {
     const formData = new FormData();
 
     // Agrega los demás campos al formData
     for (const key in rest) {
-      formData.append(key, rest[key as keyof typeof rest]);
+      let value = rest[key as keyof typeof rest];
+      if (value instanceof Date) {
+        value = value.toISOString(); // Convertir fecha a formato ISO
+      }
+      formData.append(key, value);
     }
 
     // Agrega las imágenes al formData

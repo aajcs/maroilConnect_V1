@@ -1,6 +1,4 @@
 import 'react-native-gesture-handler';
-import {useEffect} from 'react';
-import {AppState, useColorScheme} from 'react-native';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import * as eva from '@eva-design/eva';
 import {NavigationContainer} from '@react-navigation/native';
@@ -10,6 +8,7 @@ import {AuthProvider} from './presentation/providers/AuthProvider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
+import {useConfigStore} from './presentation/store/iu/useConfigStore';
 
 const queryClient = new QueryClient();
 const lightTheme = {
@@ -26,18 +25,16 @@ const darkTheme = {
 };
 
 export const MaroilConnectApp = () => {
-  const colorScheme = useColorScheme();
+  const {checked} = useConfigStore();
 
-  const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+  const theme = checked ? darkTheme : lightTheme;
 
-  const backgroundColor =
-    colorScheme === 'dark'
-      ? theme['color-basic-800']
-      : theme['color-basic-100'];
-  const textColor =
-    colorScheme === 'dark'
-      ? theme['color-basic-100']
-      : theme['color-basic-800'];
+  const backgroundColor = checked
+    ? theme['color-basic-800']
+    : theme['color-basic-100'];
+  const textColor = checked
+    ? theme['color-basic-100']
+    : theme['color-basic-800'];
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -46,7 +43,7 @@ export const MaroilConnectApp = () => {
       <ApplicationProvider {...eva} theme={theme}>
         <NavigationContainer
           theme={{
-            dark: colorScheme === 'dark',
+            dark: checked,
             colors: {
               primary: theme['color-primary-500'],
               background: backgroundColor,

@@ -21,7 +21,6 @@ export const ChatScreen = () => {
     params: {chat},
   } = useRoute();
   // const [messages, setMessages] = useState(null);
-  console.log('chat', chat);
 
   const {isLoading, data: chatMessageData} = useQuery({
     queryKey: ['chatMessage', chat._id],

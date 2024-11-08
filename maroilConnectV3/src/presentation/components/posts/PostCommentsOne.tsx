@@ -1,7 +1,17 @@
-import {Avatar, Layout, List, ListItem, Text} from '@ui-kitten/components';
+import {
+  Avatar,
+  Button,
+  Layout,
+  List,
+  ListItem,
+  Text,
+} from '@ui-kitten/components';
 import {Post} from '../../../domain/entities/post';
 import {StyleSheet} from 'react-native';
 import {getRelativeTime} from '../../utils/timeUtil';
+import {AvatarNombre} from '../iu/AvatarNombre';
+import FastImage from 'react-native-fast-image';
+import {MyIcon} from '../iu/MyIcon';
 
 interface Props {
   post: Post;
@@ -9,6 +19,9 @@ interface Props {
 }
 
 const PostCommentsOne = ({post, setModalVisibleComentarios}: Props) => {
+  const deleteComment = () => {
+    console.log('deleteComment');
+  };
   const renderComment = ({item, index}) => (
     <Layout>
       <ListItem
@@ -17,47 +30,35 @@ const PostCommentsOne = ({post, setModalVisibleComentarios}: Props) => {
           // margin: 5,
           marginVertical: 10,
 
-          backgroundColor: 'rgba(143, 155, 179, 0.54)',
+          backgroundColor: 'rgba(143, 155, 179, 0.34)',
           // maxWidth: '80%',
           borderRadius: 10,
           paddingVertical: 6,
           paddingHorizontal: 10,
           borderBlockEndColor: 'rgba(143, 155, 179, 0.54)',
         }}
-        title={item.authorComment.nombre}
-        description={item.contentComment}
+        title={() => (
+          <Text category="s1" style={{}}>
+            {item.authorComment.nombre}
+          </Text>
+        )}
+        description={() => (
+          <Text category="c2" style={{fontWeight: '400'}}>
+            {item.contentComment}
+          </Text>
+        )}
         accessoryLeft={() =>
-          item.authorComment?.avatarUnicoUser ? (
-            <Avatar
-              style={styles.avatar}
-              shape="round"
-              source={{uri: item.authorComment?.avatarUnicoUser}}
-              defaultSource={require('../../../assets/no-product-image.png')}
-            />
-          ) : (
-            <Layout
-              style={{
-                ...styles.avatar,
-
-                borderRadius: 50,
-                backgroundColor: '#ccc',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  textAlign: 'center', // Centra el texto
-                  fontSize: 25, // Ajusta el tamaño del texto
-                }}>
-                {item.authorComment?.nombre.substring(0, 2).toUpperCase()}
-              </Text>
-            </Layout>
-          )
+          item.authorComment && <AvatarNombre usuario={item.authorComment} />
         }
         accessoryRight={() => (
-          <Text style={{fontSize: 10, paddingHorizontal: 2}}>
-            {item.createdAt && getRelativeTime(item.createdAt.toString())}
-          </Text>
+          <>
+            <Text style={{fontSize: 10, paddingHorizontal: 2}}>
+              {item.createdAt && getRelativeTime(item.createdAt.toString())}
+            </Text>
+            <Text onPress={deleteComment} status="info">
+              <MyIcon name="trash" />
+            </Text>
+          </>
         )}
       />
     </Layout>

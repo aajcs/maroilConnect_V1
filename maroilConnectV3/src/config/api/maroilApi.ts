@@ -6,10 +6,10 @@ const STAGE = 'prod';
 
 const PROD_URL = 'https://apimaroil.herokuapp.com/api';
 const API_URL_IOS = 'http://localhost:4000/api';
-const API_URL_ANDROID = 'http://172.41.30.80:4000/api';
+const API_URL_ANDROID = 'http://172.41.30.119:4000/api';
 
 export const API_URL =
-  STAGE !== 'prod'
+  STAGE === 'prod'
     ? PROD_URL
     : Platform.OS === 'ios'
     ? API_URL_IOS

@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {UnreadMessages} from '../../../actions/chat/UnreadMessagesActions';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import {useConfigStore} from '../../store/iu/useConfigStore';
+import {AvatarNombre} from '../iu/AvatarNombre';
 
 interface Props {
   chat: Chat;
@@ -27,6 +29,8 @@ interface Props {
 const unreadMessagesController = new UnreadMessages();
 
 export const ChatCardList = ({chat, upTopChat}: Props) => {
+  const {checked} = useConfigStore();
+
   const {participanteOne, participanteTwo} = chat;
   const navigation = useNavigation();
   const theme = useTheme();
@@ -97,10 +101,7 @@ export const ChatCardList = ({chat, upTopChat}: Props) => {
 
   return (
     <Layout
-      style={[
-        styles.container,
-        {shadowColor: colorScheme !== 'dark' ? '#000' : '#fff'},
-      ]}>
+      style={[styles.container, {shadowColor: checked ? '#fff' : '#000'}]}>
       <AwesomeAlert
         // overlayStyle={{backgroundColor: theme['background-basic-color-1']}}
         titleStyle={{color: theme['text-basic-color']}}
@@ -134,29 +135,8 @@ export const ChatCardList = ({chat, upTopChat}: Props) => {
         onLongPress={() => {
           setShowAlert(true);
         }}>
-        {userChat?.avatarUnicoUser ? (
-          <Avatar
-            style={styles.avatar}
-            shape="round"
-            source={{
-              uri: userChat.avatarUnicoUser,
-            }}
-            defaultSource={require('../../../assets/no-product-image.png')}
-          />
-        ) : (
-          <Layout
-            style={{
-              ...styles.avatar,
-              borderRadius: 25,
-              backgroundColor: '#ccc',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text style={{fontSize: 20}}>
-              {userChat.nombre.substring(0, 2).toUpperCase()}
-            </Text>
-          </Layout>
-        )}
+        {userChat && <AvatarNombre usuario={userChat} />}
+
         <Layout style={styles.infoContent}>
           <Layout style={styles.info}>
             <Text style={styles.identity}>{userChat.nombre}</Text>

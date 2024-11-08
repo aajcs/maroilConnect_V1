@@ -1,15 +1,15 @@
-import {useInfiniteQuery} from '@tanstack/react-query';
-import {Button, Layout} from '@ui-kitten/components';
+import {useInfiniteQuery, useQueryClient} from '@tanstack/react-query';
+import {Button, Layout, Text} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {
   View,
   Modal,
-  Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   useWindowDimensions,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {getPostsBorrador} from '../../../actions/posts/getPostsActions';
 
@@ -33,10 +33,10 @@ export const ModalManejoSolido: React.FC<MyModalProps> = ({
   setModalVisible,
   isLoading,
   data,
-  fetchNextPage,
-  isFetchingNextPage,
 }) => {
   const [contentVisible, setContentVisible] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (modalVisible) {
@@ -51,13 +51,26 @@ export const ModalManejoSolido: React.FC<MyModalProps> = ({
       setContentVisible(false);
     }
   }, [modalVisible]);
-  const {height: viewportHeight} = useWindowDimensions();
 
-  const {logout, user} = useAuthStore();
-  const {rolesMaroilConnect} = user || {}; // Add type guard to ensure 'user' is defined
+  const {user} = useAuthStore();
 
-  const hasNotRol = rolesMaroilConnect?.includes('NotRol');
+  const {rolesMaroilConnect, roles, apps} = user || {}; // Add type guard to ensure 'user' is defined
 
+  const hasNotRol = rolesMaroilConnect?.some(role =>
+    ['lectura', 'NotRol', 'colaborador'].includes(role),
+  );
+  const hasNotRolMaroil = roles?.some(role =>
+    ['SUPERADMIN', 'ADMIN', 'OPERADOR', 'LECTURA', 'CLIENTE'].includes(role),
+  );
+  const hasNotAppMaroil = apps?.some(app =>
+    ['SUPERAPPS', 'CONTROLAPPS'].includes(app),
+  );
+  const onPullToRefresh = async () => {
+    setIsRefreshing(true);
+    queryClient.invalidateQueries({queryKey: ['manejoSolidos', 'infinite']});
+
+    setIsRefreshing(false);
+  };
   return (
     <Modal visible={modalVisible} animationType="slide">
       <Layout
@@ -74,14 +87,25 @@ export const ModalManejoSolido: React.FC<MyModalProps> = ({
               }}>
               {
                 /* Add conditional rendering based on 'rolesMaroilConnect' */
-                !hasNotRol ? (
+                !hasNotRol && hasNotAppMaroil && hasNotRolMaroil ? (
                   isLoading ? (
                     <FullScreenLoader />
                   ) : (
-                    <ScrollView>
-                      {data.map(item => {
-                        return <CardManejoSolido key={item.id} data={item} />;
-                      })}
+                    <ScrollView
+                      bounces={!isRefreshing}
+                      refreshControl={
+                        <RefreshControl
+                          refreshing={isRefreshing}
+                          onRefresh={onPullToRefresh}
+                        />
+                      }>
+                      {data ? (
+                        data.map(item => {
+                          return <CardManejoSolido key={item.id} data={item} />;
+                        })
+                      ) : (
+                        <Text>Sin Datos</Text>
+                      )}
                     </ScrollView>
                   )
                 ) : (

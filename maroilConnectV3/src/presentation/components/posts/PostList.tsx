@@ -1,4 +1,4 @@
-import {Layout, List} from '@ui-kitten/components';
+import {Button, Layout, List} from '@ui-kitten/components';
 import {Post} from '../../../domain/entities/post';
 import {PostCard} from './PostCard';
 import {useContext, useRef, useState} from 'react';
@@ -16,6 +16,8 @@ interface Props {
   fetchNextPage: () => void;
   isFetchingNextPage: boolean;
   borrador?: boolean;
+  handleGoToTop: () => void;
+  listRef: any;
 }
 
 export const PostList = ({
@@ -23,6 +25,8 @@ export const PostList = ({
   fetchNextPage,
   isFetchingNextPage,
   borrador,
+  handleGoToTop,
+  listRef,
 }: Props) => {
   const queryClient = useQueryClient();
   const scrollY = useContext(TabBarVisibleContext);
@@ -53,12 +57,14 @@ export const PostList = ({
     const isScrollingDown = currentScrollY > previousScrollY.current;
     previousScrollY.current = currentScrollY;
 
-    Animated.spring(scrollY, {
-      toValue: isScrollingDown ? 1 : -1,
-      tension: 25,
-      friction: 10,
-      useNativeDriver: false,
-    }).start();
+    if (currentScrollY > 300) {
+      Animated.spring(scrollY, {
+        toValue: isScrollingDown ? 1 : -1,
+        tension: 25,
+        friction: 10,
+        useNativeDriver: false,
+      }).start();
+    }
   };
   const renderItem = ({item, index}) => (
     <PostCard
@@ -69,30 +75,36 @@ export const PostList = ({
     />
   );
   return (
-    <List
-      onScroll={!borrador ? handleScroll : undefined}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-      bounces={!isRefreshing}
-      style={{paddingBottom: 0}}
-      data={post}
-      keyExtractor={(item, index) => `${item.id}-${index}`}
-      renderItem={renderItem}
-      ListFooterComponent={() => (
-        <Layout style={{height: 100, backgroundColor: 'trasparente'}} />
-      )}
-      // ListFooterComponent={
-      //   () => <Layout style={{height: 100}} />
-      //   //   isFetchingNextPage && <ActivityIndicator size="large" color="#0000ff" />
-      // }
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onPullToRefresh} />
-      }
-      onEndReached={fetchNextPage}
-      onEndReachedThreshold={0.8}
-    />
+    <>
+      <List
+        ref={listRef}
+        onScroll={!borrador ? handleScroll : undefined}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        bounces={!isRefreshing}
+        style={{paddingBottom: 0}}
+        data={post}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        renderItem={renderItem}
+        ListFooterComponent={() => (
+          <Layout style={{height: 100, backgroundColor: 'trasparente'}} />
+        )}
+        // ListFooterComponent={
+        //   () => <Layout style={{height: 100}} />
+        //   //   isFetchingNextPage && <ActivityIndicator size="large" color="#0000ff" />
+        // }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onPullToRefresh}
+          />
+        }
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={0.8}
+      />
+    </>
   );
 };

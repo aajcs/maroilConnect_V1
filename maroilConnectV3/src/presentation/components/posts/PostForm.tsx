@@ -14,11 +14,13 @@ import {
   Image,
   Modal,
   Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
   useColorScheme,
+  useWindowDimensions,
 } from 'react-native';
 import {Post} from '../../../domain/entities/post';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
@@ -30,15 +32,20 @@ import {useState} from 'react';
 import Video from 'react-native-video';
 import Toast from 'react-native-toast-message';
 import {CategoryPicker} from '../iu/CategoryPicker';
+import ImageModal from './ImageModal';
 
 interface Props {
   post: Post;
   postIdRef: React.MutableRefObject<string | undefined>;
 }
 export const PostForm = ({post, postIdRef}: Props) => {
+  const {width: viewportWidth} = useWindowDimensions();
+
   const [visible, setVisible] = useState(false);
   const [isloading, setIsLoading] = useState(false);
   const [charCount, setCharCount] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -46,10 +53,12 @@ export const PostForm = ({post, postIdRef}: Props) => {
   const mutation = useMutation({
     mutationFn: async (data: Post) => {
       setIsLoading(true);
+      const fechaAprobadoPost = new Date();
       await updateCreatePostAction({
         ...data,
         id: post.id,
-        estatusPost: 'Borrador',
+        estatusPost: 'Aprobado',
+        fechaAprobadoPost: fechaAprobadoPost,
       });
       return data;
     },
@@ -160,6 +169,10 @@ export const PostForm = ({post, postIdRef}: Props) => {
     }
   };
   const renderItem = (item, index) => {
+    const handleModalClose = () => {
+      setModalVisible(false);
+    };
+
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
     const isImage = /\.(jpg|png|jpeg|gif)$/i.test(item.url);
     return (
@@ -173,10 +186,16 @@ export const PostForm = ({post, postIdRef}: Props) => {
           />
         )}
         {isImage && (
-          <Image
-            source={{uri: item.url.toString()}}
-            style={styles.mediaImage}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedImage(item.url);
+              setModalVisible(true);
+            }}>
+            <Image
+              source={{uri: item.url.toString()}}
+              style={styles.mediaImage}
+            />
+          </TouchableOpacity>
         )}
         {/* <Image source={{uri: item.url.toString()}} style={styles.mediaImage} /> */}
         {/* <Video
@@ -194,6 +213,31 @@ export const PostForm = ({post, postIdRef}: Props) => {
           }}>
           <Text style={styles.deleteButtonText}>X</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <SafeAreaView style={{flex: 1}}>
+            <Layout style={styles.centeredView}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}>
+                <Text style={styles.textStyle}>Cerrar</Text>
+              </TouchableOpacity>
+              {selectedImage && (
+                <Image
+                  source={{uri: selectedImage}}
+                  style={styles.fullScreenImage}
+                />
+              )}
+            </Layout>
+          </SafeAreaView>
+        </Modal>
       </View>
     );
   };
@@ -228,7 +272,7 @@ export const PostForm = ({post, postIdRef}: Props) => {
             <Text category="s2">Crear Publicacion</Text>
           </Layout> */}
           <Layout style={{flex: 1, alignItems: 'center'}}>
-            <Text category="h6">Crear publicacion</Text>
+            <Text category="h6">Crear publicación</Text>
           </Layout>
           <Layout style={{flexDirection: 'row', alignItems: 'center'}}>
             <Button
@@ -249,7 +293,7 @@ export const PostForm = ({post, postIdRef}: Props) => {
 
         <Input
           style={{marginTop: 10}}
-          placeholder="Titulo"
+          placeholder="Título"
           value={formik.values.titlePost}
           onChangeText={handleTextChange}
           maxLength={60}
@@ -361,5 +405,28 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: 'red',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 10,
+    zIndex: 1,
+  },
+  textStyle: {
+    // color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

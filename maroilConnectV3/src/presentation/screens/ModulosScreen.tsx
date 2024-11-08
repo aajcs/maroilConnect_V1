@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
-import {Text, Layout} from '@ui-kitten/components';
+import {Text, Layout, useTheme} from '@ui-kitten/components';
 import {
   useInfiniteQuery,
   useQuery,
@@ -8,15 +8,23 @@ import {
 } from '@tanstack/react-query';
 import {MyIcon} from '../components/iu/MyIcon';
 import {ModalGlobal} from '../components/iu/ModalGlobal';
-import {useFocusEffect} from '@react-navigation/native';
 import {getPostsBorrador} from '../../actions/posts/getPostsActions';
 import {getManejoSolidosActions} from '../../actions/manejoSolido/getManejoSolidosActions';
 import {ModalManejoSolido} from '../components/manejoSolido/ModalManejoSolido';
+import {ModalPoliticasUso} from '../components/politicas/ModalPoliticasUso';
+import {ModalContruction} from '../components/iu/ModalContruction';
+import {ModalUsuario} from '../components/usuario/ModalUsuario';
 
 export const ModulosScreen = () => {
+  const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleUsuario, setModalVisibleUsuario] = useState(false);
+  const [modalVisibleIdeas, setModalVisibleIdeas] = useState(false);
+  const [modalVisibleIdeas2, setModalVisibleIdeas2] = useState(false);
+  const [modalVisibleIdeas3, setModalVisibleIdeas3] = useState(false);
   const [modalVisibleManejoSolido, setModalVisibleManejoSolido] =
     useState(false);
+  const [modalVisiblePoliticaUso, setModalVisiblePoliticaUso] = useState(false);
   const queryClient = useQueryClient();
   const [postParaAprobar, setPostParaAprobar] = useState(0);
   const {isLoading, isFetchingNextPage, data, fetchNextPage} = useInfiniteQuery(
@@ -49,6 +57,25 @@ export const ModulosScreen = () => {
 
     fetchData();
   }, [data]);
+  const MyLayout = ({onPress, iconName, text}: any) => (
+    <Layout style={styles.layout} level="3">
+      <TouchableOpacity onPress={onPress}>
+        <Layout style={styles.layout} level="3">
+          <MyIcon
+            name={iconName}
+            height={50}
+            width={50}
+            color={theme['color-primary-500']}
+          />
+          <Text
+            style={{textAlign: 'center', flexWrap: 'wrap'}}
+            numberOfLines={2}>
+            {text}
+          </Text>
+        </Layout>
+      </TouchableOpacity>
+    </Layout>
+  );
   return (
     <ScrollView>
       <ModalGlobal
@@ -67,6 +94,29 @@ export const ModulosScreen = () => {
         fetchNextPage={fetchNextPage}
         isFetchingNextPage={isFetchingNextPage}
       />
+      <ModalPoliticasUso
+        modalVisible={modalVisiblePoliticaUso}
+        setModalVisible={setModalVisiblePoliticaUso}
+      />
+      <ModalContruction
+        modalVisible={modalVisibleIdeas}
+        setModalVisible={setModalVisibleIdeas}
+        message="Tiene la finalidad de elegir entre una data pre cargada de publicaciones de fechas resaltantes como el día de la tierra, día del agua, día del reciclaje, entre otros, para que el usuario pueda seleccionar y publicar en la red social."
+      />
+      <ModalContruction
+        modalVisible={modalVisibleIdeas2}
+        setModalVisible={setModalVisibleIdeas2}
+        message="Tiene la finalidad de mostrar la información del manejo de sólidos de la app Maroil Trading, al mismo formato que la de manejo de sólidos."
+      />
+      <ModalContruction
+        modalVisible={modalVisibleIdeas3}
+        setModalVisible={setModalVisibleIdeas3}
+        message="Tiene la finalidad de mostrar la información del reporte mensual de la app Maroil Trading, al mismo formato que la de manejo de sólidos."
+      />
+      <ModalUsuario
+        modalVisible={modalVisibleUsuario}
+        setModalVisible={setModalVisibleUsuario}
+      />
       <Layout style={styles.container}>
         <Layout style={styles.layout} level="3">
           <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -76,6 +126,7 @@ export const ModulosScreen = () => {
                   name="checkmark-circle-outline"
                   height={50}
                   width={50}
+                  color={theme['color-primary-500']}
                 />
                 <Layout style={styles.totalUnreadContent}>
                   <Text style={styles.totalUnread} status="info">
@@ -83,46 +134,44 @@ export const ModulosScreen = () => {
                   </Text>
                 </Layout>
               </Layout>
-              <Text>Aprobar Post</Text>
-              <Text numberOfLines={1} ellipsizeMode="tail">
-                {postParaAprobar < 10
-                  ? `Tienes ${postParaAprobar} por aprobar`
-                  : 'Tienes muchos post para aprobar'}
-              </Text>
+              <Text>Aprobar post</Text>
             </Layout>
           </TouchableOpacity>
         </Layout>
-
-        <Layout style={styles.layout} level="3">
-          <MyIcon name="alert-triangle-outline" height={50} width={50} />
-          <Text>Politicas de Uso</Text>
-        </Layout>
-        <Layout style={styles.layout} level="3">
-          <MyIcon name="people-outline" height={50} width={50} />
-          <Text style={{textAlign: 'center'}}>Administracion de usuarios</Text>
-        </Layout>
+        <MyLayout
+          onPress={() => setModalVisiblePoliticaUso(true)}
+          iconName="alert-triangle-outline"
+          text="Políticas"
+        />
+        <MyLayout
+          onPress={() => setModalVisibleUsuario(true)}
+          iconName="people-outline"
+          text="Configuración de usuarios"
+        />
       </Layout>
       <Layout style={styles.container}>
-        <Layout style={styles.layout} level="3">
-          <MyIcon name="bulb-outline" height={50} width={50} />
-          <Text style={{textAlign: 'center'}}> Ideas de Publicacion</Text>
-        </Layout>
-        <TouchableOpacity onPress={() => setModalVisibleManejoSolido(true)}>
-          <Layout style={styles.layout} level="3">
-            <MyIcon name="file-text-outline" height={50} width={50} />
-            <Text>Manejo de solidos</Text>
-          </Layout>
-        </TouchableOpacity>
-        <Layout style={styles.layout} level="3">
-          <MyIcon name="file-text-outline" height={50} width={50} />
-          <Text>Manejo de liquidos</Text>
-        </Layout>
+        <MyLayout
+          onPress={() => setModalVisibleIdeas(true)}
+          iconName="bulb-outline"
+          text="Ideas de publicación"
+        />
+        <MyLayout
+          onPress={() => setModalVisibleManejoSolido(true)}
+          iconName="cube-outline"
+          text="Manejo de sólido"
+        />
+        <MyLayout
+          onPress={() => setModalVisibleIdeas2(true)}
+          iconName="droplet-outline"
+          text="Manejo de líquido"
+        />
       </Layout>
       <Layout style={styles.container}>
-        <Layout style={styles.layout} level="3">
-          <MyIcon name="activity-outline" height={50} width={50} />
-          <Text>Reporte gerencia</Text>
-        </Layout>
+        <MyLayout
+          onPress={() => setModalVisibleIdeas3(true)}
+          iconName="activity-outline"
+          text="Reporte de gerencia"
+        />
         <Layout style={styles.layout}>
           {/* <MyIcon name="home" height={50} width={50} />
           <Text>Reporte gerencia</Text> */}
@@ -139,13 +188,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    // padding: 10,
     paddingHorizontal: 10,
     height: 150,
   },
   layout: {
-    margin: 10,
     flex: 1,
+    margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

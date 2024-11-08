@@ -15,9 +15,12 @@ export const StatItem = ({icon, count, onClick, color}: Props) => {
       style={{flexDirection: 'row', alignItems: 'center'}}
       onTouchEnd={onClick}>
       {icon && <MyIcon name={icon} color={color} />}
-      <Text style={{marginHorizontal: 2}} category="s1">
-        {count}
-      </Text>
+
+      {count !== undefined && (
+        <Text style={{marginHorizontal: 3}} category="s1">
+          {count}
+        </Text>
+      )}
     </Layout>
   );
 };

@@ -52,7 +52,9 @@ export const ModalGlobal: React.FC<MyModalProps> = ({
   const {logout, user} = useAuthStore();
   const {rolesMaroilConnect} = user || {}; // Add type guard to ensure 'user' is defined
 
-  const hasNotRol = rolesMaroilConnect?.includes('NotRol');
+  const hasNotRol = rolesMaroilConnect?.some(role =>
+    ['administrador', 'moderador'].includes(role),
+  );
 
   return (
     <Modal visible={modalVisible} animationType="slide">
@@ -70,7 +72,7 @@ export const ModalGlobal: React.FC<MyModalProps> = ({
               }}>
               {
                 /* Add conditional rendering based on 'rolesMaroilConnect' */
-                !hasNotRol ? (
+                hasNotRol ? (
                   isLoading ? (
                     <FullScreenLoader />
                   ) : (

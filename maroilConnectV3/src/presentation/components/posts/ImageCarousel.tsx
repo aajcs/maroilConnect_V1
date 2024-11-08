@@ -5,7 +5,7 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image';
 import VideoPlayer from 'react-native-media-console';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {MyIcon} from '../iu/MyIcon';
 
 interface Props {
@@ -26,6 +26,20 @@ export const ImageCarousel = ({
 }: Props) => {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
+  const [imageSizes, setImageSizes] = useState<{
+    [url: string]: {width: number; height: number};
+  }>({});
+
+  useEffect(() => {
+    images.forEach(image => {
+      Image.getSize(image.url, (width, height) => {
+        setImageSizes(prevSizes => ({
+          ...prevSizes,
+          [image.url]: {width, height},
+        }));
+      });
+    });
+  }, [images]);
 
   const handleMute = () => {
     setMuted(!muted);
@@ -39,6 +53,9 @@ export const ImageCarousel = ({
   const renderItem = ({item, index}: {item: {url: string}; index: number}) => {
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
     const isImage = /\.(jpg|png|jpeg|gif)/i.test(item.url);
+    const imageSize = imageSizes[item.url] || {width: 0, height: 0};
+    const aspectRatio = imageSize.width / imageSize.height;
+    const containerHeight = aspectRatio > 1 ? 400 : 600;
 
     return (
       <Layout style={{flex: 1}}>
@@ -48,7 +65,7 @@ export const ImageCarousel = ({
               ref={videoRef}
               source={{uri: item.url.toString()}}
               style={styles.mediaImage}
-              resizeMode="cover"
+              resizeMode="none"
               controls={true}
               fullscreenAutorotate={true}
               paused={!isViewable}
@@ -67,7 +84,7 @@ export const ImageCarousel = ({
         )}
         {isImage && (
           <TouchableWithoutFeedback onPress={() => onImagePress(images, index)}>
-            <FastImage
+            {/* <FastImage
               style={{width: '100%', height: 400}}
               source={{
                 uri: item.url,
@@ -75,6 +92,18 @@ export const ImageCarousel = ({
                 priority: FastImage.priority.normal,
               }}
               resizeMode={FastImage.resizeMode.cover}
+            /> */}
+            <FastImage
+              style={{
+                width: '100%',
+                height: images.length > 1 ? 400 : containerHeight,
+              }}
+              source={{
+                uri: item.url,
+                headers: {Authorization: 'someAuthToken'},
+                priority: FastImage.priority.normal,
+              }}
+              // resizeMode={FastImage.resizeMode.none}
             />
           </TouchableWithoutFeedback>
         )}

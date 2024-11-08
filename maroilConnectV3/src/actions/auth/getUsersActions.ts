@@ -24,7 +24,6 @@ export const getUsersBuscarChatActions = async (user: FaidUser) => {
     const usuarios = data.map(usuario =>
       UsuarioMapper.usuarioToEntity(usuario),
     );
-    console.log('user', user);
 
     if (user.rolesMaroilConnect.some(role => role === 'NotRol')) {
       const usuariosFiltrados = usuarios.filter(
@@ -35,6 +34,25 @@ export const getUsersBuscarChatActions = async (user: FaidUser) => {
 
     const usuariosFiltrados = usuarios.filter(
       usuario => usuario.chatMaroilConnect === true,
+    );
+
+    return usuariosFiltrados;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+export const getUserAdministracionActions = async (user: FaidUser) => {
+  try {
+    const {data} = await maroilApi.get<UsuarioInterface[]>('/usuario');
+
+    const usuarios = data.map(usuario =>
+      UsuarioMapper.usuarioToEntity(usuario),
+    );
+
+    const usuariosFiltrados = usuarios.filter(
+      usuario =>
+        usuario.chatMaroilConnect != null && usuario.rolesMaroilConnect != null,
     );
 
     return usuariosFiltrados;

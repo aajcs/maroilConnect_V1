@@ -125,7 +125,7 @@ export const ChatMessageForm = ({chat}: Props) => {
         }
       }}>
       {isFocused ? (
-        <MyIcon name="paper-plane-outline" color="#002885" {...props} />
+        <MyIcon name="paper-plane-outline" {...props} />
       ) : (
         <MyIcon name="paper-plane-outline" {...props} />
       )}
@@ -185,7 +185,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     borderRadius: 50,
     // marginLeft: 15,
-    borderColor: '#002885',
+    // borderColor: '#002885',
   },
   iconSend: {
     position: 'absolute',

@@ -133,7 +133,7 @@ export const MenuActions = ({
       )}
 
       {user?.rolesMaroilConnect.some(role =>
-        ['admin', 'superadmin'].includes(role),
+        ['administrador', 'superadmin'].includes(role),
       ) ? (
         <MenuItem
           accessoryLeft={<MyIcon name="trash" />}

@@ -21,28 +21,28 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
   const categoriesLocal = categories || [
     'Maroil Connect',
     'A.I.T.',
-    'Consultoria Juridica',
-    'Direcciòn Ejecutiva',
+    'Consultoría Jurídica',
+    'Dirección Ejecutiva',
     'Finanzas',
     'Gerencia General',
-    'Imagen Y Comunicaciòn',
-    'Ingenieria Y Construccion',
+    'Imagen y Comunicación',
+    'Ingeniería y Construcción',
     'Maroil Services',
-    'Operaciones Maritimas',
+    'Operaciones Marítimas',
     'Operaciones Petrocedeño',
     'Operaciones Terrestres',
-    'Planificaciòn Y Gestiòn Estrategica',
+    'Planificación y Gestión Estratégica',
     'Procura',
     'Proyectos',
     'Relaciones Laborales',
-    'Seguridad Estrategica Operacional',
-    'Servicios Logisticos',
+    'Seguridad Estratégica Operacional',
+    'Servicios Logísticos',
     'Siho-A',
     'Talento Humano',
-    'Equipos Moviles',
+    'Equipos Móviles',
     'Instrumentación',
-    'Mantenimiento Electrico',
-    'Mantenimiento Mecanico',
+    'Mantenimiento Eléctrico',
+    'Mantenimiento Mecánico',
   ];
 
   return (
@@ -85,7 +85,7 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
                     />
                   ))}
                 </Picker>
-                <Button onPress={toggleModal}>"Cerrar"</Button>
+                <Button onPress={toggleModal}>Cerrar</Button>
               </View>
             </View>
           </Modal>

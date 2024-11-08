@@ -5,15 +5,17 @@ import {MyIcon} from '../iu/MyIcon';
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image';
 import {useState} from 'react';
+import ImageZoom from 'react-native-image-pan-zoom';
+import {Dimensions} from 'react-native';
 
 interface Props {
   images: {url: string}[];
   viewportWidth: number;
-  activeSlide: number;
+  activeSlide?: number;
   visible: boolean;
   onClose: () => void;
-  initialSlideIndex: number;
-  onSlideChange: (index: number) => void;
+  initialSlideIndex?: number;
+  onSlideChange?: (index: number) => void;
 }
 
 const ImageModal = ({
@@ -76,15 +78,21 @@ const ImageModal = ({
           />
         )}
         {isImage && (
-          <FastImage
-            style={{width: '100%', height: '100%'}}
-            source={{
-              uri: item.url,
-              headers: {Authorization: 'someAuthToken'},
-              priority: FastImage.priority.normal,
-            }}
-            resizeMode={FastImage.resizeMode.contain}
-          />
+          <ImageZoom
+            cropWidth={Dimensions.get('window').width}
+            cropHeight={Dimensions.get('window').height}
+            imageWidth={Dimensions.get('window').width}
+            imageHeight={Dimensions.get('window').height}>
+            <FastImage
+              style={{width: '100%', height: '100%'}}
+              source={{
+                uri: item.url,
+                headers: {Authorization: 'someAuthToken'},
+                priority: FastImage.priority.normal,
+              }}
+              resizeMode={FastImage.resizeMode.contain}
+            />
+          </ImageZoom>
         )}
         {/* <Image
           source={{uri: item.url}}

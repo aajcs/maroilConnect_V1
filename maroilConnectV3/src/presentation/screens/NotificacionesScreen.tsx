@@ -25,7 +25,7 @@ export const NotificacionesScreen = () => {
   // };
   return (
     <View>
-      <Text>NotificacionesScreen</Text>
+      {/* <Text>NotificacionesScreen</Text> */}
       <Button onPress={() => setVisible(true)}>Activar notificaciones</Button>
       <AwesomeAlert
         show={visible}

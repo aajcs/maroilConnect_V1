@@ -6,6 +6,7 @@ import {Avatar, Layout, Text, TopNavigationAction} from '@ui-kitten/components';
 import {Chat} from '../../../domain/entities/chat';
 import {MyIcon} from '../iu/MyIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AvatarNombre} from '../iu/AvatarNombre';
 
 interface CabeceraChatProps {
   chat: Chat;
@@ -69,29 +70,8 @@ export function CabeceraChat({chat}: CabeceraChatProps) {
 
             {userChat && (
               <Pressable onPress={() => {}} style={styles.info}>
-                {userChat?.avatarUnicoUser ? (
-                  <Avatar
-                    style={styles.avatar}
-                    shape="round"
-                    source={{
-                      uri: userChat?.avatarUnicoUser,
-                    }}
-                  />
-                ) : (
-                  <Layout
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 25,
-                      backgroundColor: '#ccc',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 20}}>
-                      {userChat.nombre.substring(0, 2).toUpperCase()}
-                    </Text>
-                  </Layout>
-                )}
+                {userChat && <AvatarNombre usuario={userChat} />}
+
                 <Text style={styles.identity}>{userChat.nombre}</Text>
               </Pressable>
             )}
