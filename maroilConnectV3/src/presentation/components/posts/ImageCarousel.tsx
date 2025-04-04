@@ -1,4 +1,4 @@
-import {Layout, Button} from '@ui-kitten/components';
+import {Layout, Button, Text, Spinner} from '@ui-kitten/components';
 import {Image, Platform, StyleSheet} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
@@ -30,6 +30,15 @@ export const ImageCarousel = ({
     [url: string]: {width: number; height: number};
   }>({});
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleImageLoadStart = () => {
+    setIsLoading(true);
+  };
   useEffect(() => {
     images.forEach(image => {
       Image.getSize(image.url, (width, height) => {
@@ -52,7 +61,7 @@ export const ImageCarousel = ({
   );
   const renderItem = ({item, index}: {item: {url: string}; index: number}) => {
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
-    const isImage = /\.(jpg|png|jpeg|gif)/i.test(item.url);
+    const isImage = /\.(jpg|png|jpeg|gif|heic)/i.test(item.url);
     const imageSize = imageSizes[item.url] || {width: 0, height: 0};
     const aspectRatio = imageSize.width / imageSize.height;
     const containerHeight = aspectRatio > 1 ? 400 : 600;
@@ -61,6 +70,11 @@ export const ImageCarousel = ({
       <Layout style={{flex: 1}}>
         {isVideo && (
           <>
+            {isLoading && (
+              <Layout style={styles.spinnerContainer}>
+                <Spinner size="giant" status="info" />
+              </Layout>
+            )}
             <Video
               ref={videoRef}
               source={{uri: item.url.toString()}}
@@ -71,6 +85,8 @@ export const ImageCarousel = ({
               paused={!isViewable}
               muted={muted}
               repeat={true}
+              onLoadStart={handleImageLoadStart}
+              onLoad={handleImageLoad}
             />
             {Platform.OS === 'android' && (
               <Button
@@ -93,18 +109,27 @@ export const ImageCarousel = ({
               }}
               resizeMode={FastImage.resizeMode.cover}
             /> */}
-            <FastImage
-              style={{
-                width: '100%',
-                height: images.length > 1 ? 400 : containerHeight,
-              }}
-              source={{
-                uri: item.url,
-                headers: {Authorization: 'someAuthToken'},
-                priority: FastImage.priority.normal,
-              }}
-              // resizeMode={FastImage.resizeMode.none}
-            />
+            <Layout>
+              {isLoading && (
+                <Layout style={styles.spinnerContainer}>
+                  <Spinner size="giant" status="info" />
+                </Layout>
+              )}
+              <FastImage
+                style={{
+                  width: '100%',
+                  height: images.length > 1 ? 400 : containerHeight,
+                }}
+                source={{
+                  uri: item.url,
+                  headers: {Authorization: 'someAuthToken'},
+                  priority: FastImage.priority.normal,
+                }}
+                onLoadStart={handleImageLoadStart}
+                onLoad={handleImageLoad}
+                // resizeMode={FastImage.resizeMode.none}
+              />
+            </Layout>
           </TouchableWithoutFeedback>
         )}
         {/* <Video
@@ -169,5 +194,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
+  },
+  spinnerContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

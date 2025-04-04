@@ -174,7 +174,7 @@ export const PostForm = ({post, postIdRef}: Props) => {
     };
 
     const isVideo = /\.(mp4|avi|mov)/i.test(item.url.toString());
-    const isImage = /\.(jpg|png|jpeg|gif)$/i.test(item.url);
+    const isImage = /\.(jpg|png|jpeg|gif|heic)$/i.test(item.url);
     return (
       <View style={styles.mediaItem}>
         {isVideo && (

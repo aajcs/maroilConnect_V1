@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import {
   Avatar,
   Button,
@@ -10,8 +11,8 @@ import {Post} from '../../../domain/entities/post';
 import {StyleSheet} from 'react-native';
 import {getRelativeTime} from '../../utils/timeUtil';
 import {AvatarNombre} from '../iu/AvatarNombre';
-import FastImage from 'react-native-fast-image';
 import {MyIcon} from '../iu/MyIcon';
+import {useAuthStore} from '../../store/auth/useAuthStore';
 
 interface Props {
   post: Post;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const PostCommentsOne = ({post, setModalVisibleComentarios}: Props) => {
+  const {user} = useAuthStore();
   const deleteComment = () => {
     console.log('deleteComment');
   };
@@ -55,9 +57,14 @@ const PostCommentsOne = ({post, setModalVisibleComentarios}: Props) => {
             <Text style={{fontSize: 10, paddingHorizontal: 2}}>
               {item.createdAt && getRelativeTime(item.createdAt.toString())}
             </Text>
-            <Text onPress={deleteComment} status="info">
-              <MyIcon name="trash" />
-            </Text>
+            {item.authorComment.id === user?.id ||
+            user?.rolesMaroilConnect.some(role =>
+              ['administrador', 'superadmin'].includes(role),
+            ) ? (
+              <Text onPress={deleteComment} status="info">
+                <MyIcon name="trash" />
+              </Text>
+            ) : null}
           </>
         )}
       />

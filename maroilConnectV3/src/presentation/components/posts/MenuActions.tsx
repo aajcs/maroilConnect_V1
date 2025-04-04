@@ -122,7 +122,10 @@ export const MenuActions = ({
       anchor={renderMenuAction}
       visible={menuVisible}
       onBackdropPress={toggleMenu}>
-      {postAuthorId === user?.id ? (
+      {postAuthorId === user?.id ||
+      user?.rolesMaroilConnect.some(role =>
+        ['administrador', 'superadmin'].includes(role),
+      ) ? (
         <MenuItem
           accessoryLeft={<MyIcon name="edit" />}
           title="Editar"
